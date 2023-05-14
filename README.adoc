@@ -1,0 +1,15 @@
+= Fusion
+
+image::https://github.com/yupiik/fusion-examples/actions/workflows/maven.yml/badge.svg?branch=main[Github CI]
+
+[abstract]
+Examples about link:https://github.com/yupiik/fusion[Fusion framework].
+
+== Build
+
+Pre-requisite: Maven >= 3.8 and Java >= 17.
+
+[source, bash]
+----
+mvn clean install
+----

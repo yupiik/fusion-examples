@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2022-2023 - Yupiik SAS - https://www.yupiik.com
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.yupiik.fusion.examples</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Fusion Examples</name>
+    <description>Examples about the Fusion framework.</description>
+    <url>https://github.com/yupiik/fusion-examples</url>
+
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <fusion.version>1.0.2</fusion.version>
+        <junit-jupiter.version>5.9.1</junit-jupiter.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>4.2.rc3</version>
+                <executions>
+                    <execution>
+                        <id>check-license</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <inherited>false</inherited>
+                <configuration>
+                    <aggregate>true</aggregate>
+                    <mapping>
+                        <adoc>DOUBLESLASH_STYLE</adoc>
+                    </mapping>
+                    <licenseSets>
+                        <licenseSet>
+                            <inlineHeader><![CDATA[Copyright (c) ${project.inceptionYear} - ${project.organization.name} - ${project.organization.url}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+]]></inlineHeader>
+                            <useDefaultExcludes>true</useDefaultExcludes>
+                            <includes>
+                                <include>**/*.properties</include>
+                                <include>**/*.java</include>
+                                <include>**/*.xml</include>
+                                <include>**/*.yaml</include>
+                            </includes>
+                            <excludes>
+                                <exclude>LICENSE</exclude>
+                                <exclude>**/*.adoc</exclude>
+                                <exclude>**/*.idea</exclude>
+                                <exclude>**/target/**</exclude>
+                                <exclude>**/generated/**</exclude>
+                                <exclude>**/minisite/**</exclude>
+                                <exclude>**/file</exclude>
+                                <exclude>**/.m2/**</exclude>
+                            </excludes>
+                        </licenseSet>
+                    </licenseSets>
+                </configuration>
+            </plugin>
+            <plugin><!--  mvn ossindex:audit -->
+                <groupId>org.sonatype.ossindex.maven</groupId>
+                <artifactId>ossindex-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>audit-dependencies</id>
+                        <phase />
+                        <goals>
+                            <goal>audit</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scope>compile,runtime</scope>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://github.com/yupiik/fusion-examples/blob/master/LICENSE</url>
+            <distribution>may be downloaded from the Maven repository</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Romain Manni-Bucau</name>
+            <id>rmannibucau</id>
+            <roles>
+                <role>Contributor</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <name>Francois Papon</name>
+            <id>fpapon</id>
+            <roles>
+                <role>Contributor</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/yupiik/fusion-examples.git</connection>
+        <developerConnection>scm:git:https://github.com/yupiik/fusion-examples.git</developerConnection>
+        <url>https://github.com/yupiik/fusion-examples.git</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <organization>
+        <name>Yupiik SAS</name>
+        <url>https://www.yupiik.com</url>
+    </organization>
+
+    <inceptionYear>2022-2023</inceptionYear>
+</project>
