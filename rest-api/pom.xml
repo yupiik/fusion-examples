@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2022-2023 - Yupiik SAS - https://www.yupiik.com
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.yupiik.fusion.examples</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>rest-api</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>Fusion examples :: Rest API</name>
+    <description>Rest API example</description>
+
+    <properties>
+        <main.class>io.yupiik.fusion.framework.api.main.Launcher</main.class>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.yupiik.fusion</groupId>
+            <artifactId>fusion-build-api</artifactId>
+            <version>${fusion.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.yupiik.fusion</groupId>
+            <artifactId>fusion-processor</artifactId>
+            <version>${fusion.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.yupiik.fusion</groupId>
+            <artifactId>fusion-api</artifactId>
+            <version>${fusion.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.yupiik.fusion</groupId>
+            <artifactId>fusion-json</artifactId>
+            <version>${fusion.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.yupiik.fusion</groupId>
+            <artifactId>fusion-http-server</artifactId>
+            <version>${fusion.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.yupiik.fusion</groupId>
+            <artifactId>fusion-observability</artifactId>
+            <version>${fusion.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.yupiik.logging</groupId>
+            <artifactId>yupiik-logging-jul</artifactId>
+            <version>${yupiik-logging.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.yupiik.fusion</groupId>
+            <artifactId>fusion-testing</artifactId>
+            <version>${fusion.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin><!-- mvn exec:java -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>${main.class}</mainClass>
+                    <systemProperties>
+                        <property>
+                            <key>java.util.logging.manager</key>
+                            <value>io.yupiik.logging.jul.YupiikLogManager</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <trimStackTrace>false</trimStackTrace>
+                    <systemPropertyVariables>
+                        <java.util.logging.manager>io.yupiik.logging.jul.YupiikLogManager</java.util.logging.manager>
+                        <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
+                        <fusion.http-server.port>0</fusion.http-server.port>
+                        <fusion.observability.server.port>0</fusion.observability.server.port>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!--
+                    mvn arthur:native-image for binaries
+                    mvn arthur:native-image arthur:docker for build docker image with binaries
+                -->
+                <groupId>org.apache.geronimo.arthur</groupId>
+                <artifactId>arthur-maven-plugin</artifactId>
+                <version>1.0.6</version>
+                <configuration>
+                    <graalVersion>17.0.7-graalce</graalVersion>
+                    <main>${main.class}</main>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!--  mvn ossindex:audit -->
+                <groupId>org.sonatype.ossindex.maven</groupId>
+                <artifactId>ossindex-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>audit-dependencies</id>
+                        <phase />
+                        <goals>
+                            <goal>audit</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scope>compile,runtime</scope>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                    <source>${maven.compiler.release}</source>
+                    <target>${maven.compiler.release}</target>
+                    <parameters>true</parameters>
+                    <fork>false</fork>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile><!-- mvn jib:dockerBuild -Pdocker -->
+            <id>docker</id>
+            <properties>
+                <image.base>ossyupiik/java:17.0.7@sha256:1a08a09ea4374243f28a48ec5331061d53abcdac70e51c1812b32ac4055a7deb</image.base>
+                <image.title>fusion-examples-rest-api</image.title>
+                <image.name>fusion-examples-rest-api</image.name>
+                <image.workdir>/fusion-examples-rest-api</image.workdir>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <version>3.3.2</version>
+                        <configuration>
+                            <containerizingMode>packaged</containerizingMode>
+                            <from>
+                                <image>${image.base}</image>
+                            </from>
+                            <to>
+                                <image>${image.name}</image>
+                            </to>
+                            <container>
+                                <appRoot>${image.workdir}</appRoot>
+                                <workingDirectory>${image.workdir}</workingDirectory>
+                                <extraClasspath>${image.workdir}/tmfc005-${project.version}/lib/*</extraClasspath>
+                                <creationTime>${maven.build.timestamp}</creationTime>
+                                <filesModificationTime>${maven.build.timestamp}</filesModificationTime>
+                                <mainClass>io.yupiik.fusion.framework.api.main.Launcher</mainClass>
+                                <jvmFlags>
+                                    <jvmFlag>-Djava.util.logging.manager=io.yupiik.logging.jul.YupiikLogManager</jvmFlag>
+                                    <jvmFlag>-Dio.yupiik.logging.jul.handler.StandardHandler.formatter=json</jvmFlag>
+                                    <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
+                                    <jvmFlag>-Djdk.serialFilter=!*</jvmFlag>
+                                    <jvmFlag>-Djdk.jndi.object.factoriesFilter=!*</jvmFlag>
+                                    <jvmFlag>-Dcom.sun.jndi.ldap.object.trustSerialData=false</jvmFlag>
+                                    <jvmFlag>-Dtmfc005.build.timestamp=${maven.build.timestamp}</jvmFlag>
+                                </jvmFlags>
+                                <labels>
+                                    <org.opencontainers.image.created>${maven.build.timestamp}</org.opencontainers.image.created>
+                                    <org.opencontainers.image.authors>Yupiik</org.opencontainers.image.authors>
+                                    <org.opencontainers.image.vendor>Yupiik</org.opencontainers.image.vendor>
+                                    <org.opencontainers.image.title>${image.title}</org.opencontainers.image.title>
+                                    <org.opencontainers.image.description>${project.description}</org.opencontainers.image.description>
+                                    <org.opencontainers.image.version>${project.version}</org.opencontainers.image.version>
+                                    <com.meecrogate.params>_JAVA_OPTIONS=...</com.meecrogate.params>
+                                    <com.meecrogate.cmd>docker run ${image.name} &lt;args&gt;</com.meecrogate.cmd>
+                                </labels>
+                            </container>
+                            <outputPaths>
+                                <imageJson>${project.build.directory}/jib-image.json</imageJson>
+                            </outputPaths>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
