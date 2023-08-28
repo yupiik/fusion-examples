@@ -24,10 +24,6 @@ import io.yupiik.fusion.http.server.api.Request;
 import io.yupiik.fusion.http.server.api.Response;
 import io.yupiik.fusion.json.JsonMapper;
 
-import java.util.concurrent.CompletionStage;
-
-import static java.util.concurrent.CompletableFuture.completedStage;
-
 @ApplicationScoped
 public class Endpoint {
 
@@ -40,47 +36,49 @@ public class Endpoint {
     }
 
     @HttpMatcher(methods = "POST", path = "/product", pathMatching = HttpMatcher.PathMatching.EXACT)
-    public CompletionStage<Response> createProduct(final Request request, final ProductCreate productCreate) {
-        return completedStage(Response.of()
+    public Response createProduct(final Request request, final ProductCreate productCreate) {
+        return Response.of()
             .status(201)
             .header("content-type", "application/json")
             .body(jsonMapper.toString(productService.createProduct(request, productCreate)))
-            .build());
+            .build();
     }
 
     @HttpMatcher(methods = "GET", path = "/product/", pathMatching = HttpMatcher.PathMatching.STARTS_WITH)
-    public CompletionStage<Response> findProduct(final Request request) {
+    public Response findProduct(final Request request) {
         final var id = request.path().split("/")[2];
-        return completedStage(Response.of()
+        return Response.of()
                 .status(200)
                 .header("content-type", "application/json")
                 .body(jsonMapper.toString(productService.findProduct(id)))
-                .build());
+                .build();
     }
 
     @HttpMatcher(methods = "DELETE", path = "/product/", pathMatching = HttpMatcher.PathMatching.STARTS_WITH)
-    public CompletionStage<Response> deleteProduct(final Request request) {
+    public Response deleteProduct(final Request request) {
         final var id = request.path().split("/")[2];
-        return completedStage(productService.deleteProduct(id))
-                .thenApply(product -> Response.of()
+        try {
+            return Response.of()
                     .status(204)
                     .header("content-type", "application/json")
-                    .body(jsonMapper.toString(product))
-                    .build())
-                .exceptionally(throwable -> Response.of()
+                    .body(jsonMapper.toString(productService.deleteProduct(id)))
+                    .build();
+        } catch (Exception ex) {
+            return Response.of()
                     .status(404)
                     .header("content-type", "application/json")
-                    .body(jsonMapper.toString(throwable.getMessage()))
-                    .build());
+                    .body(jsonMapper.toString(ex.getMessage()))
+                    .build();
+        }
     }
 
     @HttpMatcher(methods = "PATCH", path = "/product/", pathMatching = HttpMatcher.PathMatching.STARTS_WITH)
-    public CompletionStage<Response> updateProduct(final Request request, final ProductUpdate productUpdate) {
+    public Response updateProduct(final Request request, final ProductUpdate productUpdate) {
         final var id = request.path().split("/")[2];
-        return completedStage(Response.of()
+        return Response.of()
                 .status(200)
                 .header("content-type", "application/json")
                 .body(jsonMapper.toString(productService.patchProduct(id, productUpdate)))
-                .build());
+                .build();
     }
 }
