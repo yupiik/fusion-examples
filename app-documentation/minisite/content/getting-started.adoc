@@ -1,0 +1,12 @@
+= Getting Started
+:minisite-index: 100
+:minisite-index-title: Getting Started
+:minisite-index-description: How to get started with the project.
+:minisite-index-icon: play
+
+[abstract]
+This project aims to test automatically in a Kubernetes cluster and in a monitored fashion some scenarii.
+
+Learn more:
+
+* xref:configuration.adoc[]

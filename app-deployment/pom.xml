@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2022-present - Yupiik SAS - https://www.yupiik.com
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.yupiik.fusion.examples</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>app-deployment</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>Fusion examples :: Deployment</name>
+    <description>Deployment example</description>
+
+    <properties>
+        <bundlebee.alveolus.default>observability</bundlebee.alveolus.default>
+        <bundlebee.debug>false</bundlebee.debug>
+        <namespace.name>observability</namespace.name>
+    </properties>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>bundlebee</directory>
+                <targetPath>bundlebee</targetPath>
+            </resource>
+        </resources>
+
+        <plugins>
+            <!--
+                mvn -e bundlebee:apply [-Dbundlebee.debug=true] [-Dbundlebee.alveolus.default=observability]
+                mvn -e bundlebee:delete [-Dbundlebee.debug=true] [-Dbundlebee.alveolus.default=observability]
+            -->
+            <plugin>
+                <groupId>io.yupiik</groupId>
+                <artifactId>bundlebee-maven-plugin</artifactId>
+                <version>${yupiik.bundlebee.version}</version>
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>generate-placeholders</id>-->
+<!--                        <phase>prepare-package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>placeholder-extract</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <descriptions>${project.basedir}/bundlebee/descriptions.properties</descriptions>-->
+<!--                            <outputType>FILE</outputType>-->
+<!--                            <dumpLocation>${project.basedir}/minisite/content/_partials/placeholders</dumpLocation>-->
+<!--                            <docFilename>doc.adoc</docFilename>-->
+<!--                            <propertiesFilename>sample.properties</propertiesFilename>-->
+<!--                            <completionFilename>completion.properties</completionFilename>-->
+<!--                            <failOnInvalidDescription>true</failOnInvalidDescription>-->
+<!--                            <ignoredPlaceholders>-->
+<!--                                bundlebee-.*,cronjob.*,service.*,project.*,user.name,observability.namespace.name,prometheus-simple.namespace,grafana-simple.namespace,prometheus-simple.rbac.apiVersion-->
+<!--                            </ignoredPlaceholders>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+                <configuration>
+                    <alveolus>${bundlebee.alveolus.default}</alveolus>
+                    <manifest>${project.basedir}/bundlebee/manifest.json</manifest>
+                    <kubeDryRun>${bundlebee.debug}</kubeDryRun>
+                    <kubeVerbose>${bundlebee.debug}</kubeVerbose>
+                    <mavenRepositoriesDownloadsEnabled>true</mavenRepositoriesDownloadsEnabled>
+                    <skipPackaging>
+                        <skipPackaging>none</skipPackaging>
+                    </skipPackaging>
+                    <customPlaceholders>
+                        <!-- transitive alveoli -->
+                        <grafana-simple.namespace>${namespace.name}</grafana-simple.namespace>
+                        <prometheus-simple.namespace>${namespace.name}</prometheus-simple.namespace>
+                        <monitoring.namespace>${namespace.name}</monitoring.namespace>
+                        <!-- self -->
+                        <namespace.name>${namespace.name}</namespace.name>
+                        <!-- extracted palceholders -->
+                        <bundlebee-placeholder-import-placeholders>
+                            ${project.basedir}/bundlebee/placeholders.properties
+                        </bundlebee-placeholder-import-placeholders>
+                    </customPlaceholders>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

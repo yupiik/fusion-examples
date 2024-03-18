@@ -1,0 +1,63 @@
+{
+  "$schema": "https://raw.githubusercontent.com/yupiik/bundlebee/gh-pages/generated/jsonschema/manifest.descriptor.json",
+  "requirements": [
+    {
+      "minBundlebeeVersion": "1.0.25"
+    }
+  ],
+  "interpolateAlveoli": true,
+  "alveoli": [
+    {
+      "//type": "template",
+      "name": "_namespace",
+      "descriptors": [
+        {
+          "name": "_template/namespace/namespace.json",
+          "await": true,
+          "awaitConditions": [
+            {
+              "command": "apply",
+              "conditions": [
+                {
+                  "type": "JSON_POINTER",
+                  "pointer": "/status/phase",
+                  "value": "Active"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "//type": "template",
+      "name": "_app",
+      "descriptors": [
+        {
+          "name": "_template/service/deployment.json"
+        },
+        {
+          "name": "_template/service/service.json"
+        }
+      ]
+    },
+    {
+      "name": "app-namespace",
+      "version": "{{project.version}}",
+      "dependencies": [
+        {
+          "name": "_namespace"
+        }
+      ]
+    },
+    {
+      "name": "app",
+      "chainDependencies": true,
+      "dependencies": [
+        {
+          "name": "app-namespace"
+        }
+      ]
+    }
+  ]
+}

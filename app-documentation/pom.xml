@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2022-present - Yupiik SAS - https://www.yupiik.com
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.yupiik.fusion.examples</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>app-documentation</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>Fusion examples :: Documentation</name>
+    <description>Documentation example</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <!--
+                    mvn prepare-package yupiik-tools:minisite
+                -->
+                <groupId>io.yupiik.maven</groupId>
+                <artifactId>yupiik-tools-maven-plugin</artifactId>
+                <version>${yupiik.tools.version}</version>
+                <configuration>
+                    <source>${project.basedir}/minisite</source>
+                    <preferYupiikAsciidoc>true</preferYupiikAsciidoc>
+                    <title>${project.name}</title>
+                    <description>${project.description}</description>
+                    <logoText>${project.name}</logoText>
+                    <indexText>${project.name}</indexText>
+                    <indexSubTitle>${project.description}</indexSubTitle>
+                    <attributes>
+                        <partialsdir>${project.basedir}/minisite/content/_partials</partialsdir>
+                    </attributes>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.yupiik.maven</groupId>
+                        <artifactId>asciidoc-java</artifactId>
+                        <version>${yupiik.tools.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

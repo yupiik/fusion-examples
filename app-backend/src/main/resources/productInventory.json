@@ -1,0 +1,12 @@
+[
+  {
+    "id": "123456789",
+    "name": "Mobile Line",
+    "description": "Mobile Line with MSISDN"
+  },
+  {
+    "id": "987654321",
+    "name": "Device Phone",
+    "description": "Phone Device X Model Alpha GT"
+  }
+]

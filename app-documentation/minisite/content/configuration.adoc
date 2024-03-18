@@ -1,0 +1,22 @@
+= Configuration
+
+[abstract]
+This page lists the placeholders available, i.e. values you can use to tune the deployment.
+
+== Placeholders
+
+include::{partialsdir}/placeholders/doc.adoc[]
+
+== Completion
+
+Often placeholders are configured using properties files (see `bundlebee/placeholders.properties`).
+Using VSCode and https://github.com/rmannibucau/vscode-properties-custom-completion extension for VSCode you can even get completion on available placeholders.
+
+== Sample configuration
+
+Here is a (commented) sample placeholder properties file:
+
+[source,properties]
+----
+include::{partialsdir}/placeholders/sample.properties[]
+----
