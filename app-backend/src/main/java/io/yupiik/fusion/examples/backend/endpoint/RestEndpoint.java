@@ -50,7 +50,6 @@ public class RestEndpoint {
     public Response findProduct(final Request request) {
         final var id = request.path().split("/")[2];
         return Response.of()
-                .status(200)
                 .header("content-type", "application/json")
                 .body(jsonMapper.toString(productService.findProduct(id)))
                 .build();
@@ -68,7 +67,6 @@ public class RestEndpoint {
     @HttpMatcher(methods = "GET", path = "/order", pathMatching = HttpMatcher.PathMatching.STARTS_WITH)
     public Response findAllOrder(final Request request) {
         return Response.of()
-                .status(200)
                 .header("content-type", "application/json")
                 .body(jsonMapper.toString(orderService.findOrders()))
                 .build();
@@ -78,7 +76,6 @@ public class RestEndpoint {
     public Response findOrder(final Request request) {
         final var id = request.path().split("/")[2];
         return Response.of()
-                .status(200)
                 .header("content-type", "application/json")
                 .body(jsonMapper.toString(orderService.findOrder(id)))
                 .build();
@@ -97,7 +94,7 @@ public class RestEndpoint {
             return Response.of()
                     .status(404)
                     .header("content-type", "application/json")
-                    .body(jsonMapper.toString(ex.getMessage()))
+                    .body(jsonMapper.toString(new Error(ex.getMessage())))
                     .build();
         }
     }
@@ -106,7 +103,6 @@ public class RestEndpoint {
     public Response updateOrder(final Request request, final Order order) {
         final var id = request.path().split("/")[2];
         return Response.of()
-                .status(200)
                 .header("content-type", "application/json")
                 .body(jsonMapper.toString(orderService.updateOrder(id, order)))
                 .build();
