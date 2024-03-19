@@ -64,7 +64,7 @@ public class RestEndpoint {
             .build();
     }
 
-    @HttpMatcher(methods = "GET", path = "/order", pathMatching = HttpMatcher.PathMatching.STARTS_WITH)
+    @HttpMatcher(methods = "GET", path = "/order", pathMatching = HttpMatcher.PathMatching.EXACT)
     public Response findAllOrder(final Request request) {
         return Response.of()
                 .header("content-type", "application/json")

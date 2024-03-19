@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FusionSupport
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class MobileLineTests {
+public class RestMobileLine {
 
     private final HttpClient client = HttpClient.newHttpClient();
     private static final AtomicReference<String> id = new AtomicReference<>("xxx");
@@ -126,7 +126,7 @@ public class MobileLineTests {
                                          }
                                         """, StandardCharsets.UTF_8)
                                 )
-                        .uri(URI.create("http://localhost:" + configuration.port() + "/order/" + id.get())).build(),
+                        .uri(URI.create("http://localhost:" + configuration.port() + "/order/" + order.id())).build(),
                 ofString());
         assertAll(
                 () -> assertEquals(200, res.statusCode()),

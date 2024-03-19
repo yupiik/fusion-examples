@@ -64,6 +64,11 @@
         </dependency>
         <dependency>
             <groupId>io.yupiik.fusion</groupId>
+            <artifactId>fusion-jsonrpc</artifactId>
+            <version>${fusion.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.yupiik.fusion</groupId>
             <artifactId>fusion-http-server</artifactId>
             <version>${fusion.version}</version>
         </dependency>

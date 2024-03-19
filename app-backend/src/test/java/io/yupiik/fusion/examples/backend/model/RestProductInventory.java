@@ -16,7 +16,6 @@
 package io.yupiik.fusion.examples.backend.model;
 
 import io.yupiik.fusion.http.server.api.WebServer;
-import io.yupiik.fusion.json.JsonMapper;
 import io.yupiik.fusion.testing.Fusion;
 import io.yupiik.fusion.testing.FusionSupport;
 import org.junit.jupiter.api.MethodOrderer;
@@ -27,8 +26,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -37,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FusionSupport
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ProductInventoryTests {
+public class RestProductInventory {
 
     private final HttpClient client = HttpClient.newHttpClient();
 
