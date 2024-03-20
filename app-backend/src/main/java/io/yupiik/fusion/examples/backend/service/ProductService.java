@@ -20,10 +20,12 @@ import io.yupiik.fusion.framework.api.container.Types;
 import io.yupiik.fusion.framework.api.scope.ApplicationScoped;
 import io.yupiik.fusion.json.JsonMapper;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 @ApplicationScoped
 public class ProductService {
@@ -39,13 +41,13 @@ public class ProductService {
         // load productInventory from json file
         try (final var initProductInventory = ProductService.class.getClassLoader().getResourceAsStream("productInventory.json")) {
             List<Product> products = jsonMapper.fromBytes(new Types.ParameterizedTypeImpl(List.class, Product.class), initProductInventory.readAllBytes());
-            products.forEach(product -> productInventory.put(product.id(), product));
-        } catch (Exception exception) {
+            productInventory.putAll(products.stream().collect(toMap(Product::id, identity())));
+        } catch (final Exception exception) {
             logger.severe("Unable to load product inventory init list from resource file");
         }
     }
 
-    public Product findProduct(String id) {
+    public Product findProduct(final String id) {
         return productInventory.get(id);
     }
 
