@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FusionSupport
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class RestProductInventory {
+public class RestProductInventoryTests {
 
     private final HttpClient client = HttpClient.newHttpClient();
 

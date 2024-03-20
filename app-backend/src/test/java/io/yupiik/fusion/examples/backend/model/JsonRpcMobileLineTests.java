@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FusionSupport
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class JsonRpcMobileLine {
+public class JsonRpcMobileLineTests {
 
     private final HttpClient client = HttpClient.newHttpClient();
     private static final AtomicReference<String> id = new AtomicReference<>("xxx");
