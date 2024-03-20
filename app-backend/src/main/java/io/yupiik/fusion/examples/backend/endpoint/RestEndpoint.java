@@ -16,6 +16,7 @@
 package io.yupiik.fusion.examples.backend.endpoint;
 
 import io.yupiik.fusion.examples.backend.model.Order;
+import io.yupiik.fusion.examples.backend.model.Product;
 import io.yupiik.fusion.examples.backend.service.OrderService;
 import io.yupiik.fusion.examples.backend.service.ProductService;
 import io.yupiik.fusion.framework.api.scope.ApplicationScoped;
@@ -23,6 +24,8 @@ import io.yupiik.fusion.framework.build.api.http.HttpMatcher;
 import io.yupiik.fusion.http.server.api.Request;
 import io.yupiik.fusion.http.server.api.Response;
 import io.yupiik.fusion.json.JsonMapper;
+
+import java.util.List;
 
 @ApplicationScoped
 public class RestEndpoint {
@@ -37,22 +40,15 @@ public class RestEndpoint {
         this.jsonMapper = jsonMapper;
     }
 
-    @HttpMatcher(methods = "GET", path = "/product", pathMatching = HttpMatcher.PathMatching.STARTS_WITH)
-    public Response findAllProduct(final Request request) {
-        return Response.of()
-                .status(200)
-                .header("content-type", "application/json")
-                .body(jsonMapper.toString(productService.findProducts()))
-                .build();
+    @HttpMatcher(methods = "GET", path = "/product", pathMatching = HttpMatcher.PathMatching.EXACT)
+    public List<Product> findAllProduct(final Request request) {
+        return productService.findProducts();
     }
 
     @HttpMatcher(methods = "GET", path = "/product/", pathMatching = HttpMatcher.PathMatching.STARTS_WITH)
-    public Response findProduct(final Request request) {
+    public Product findProduct(final Request request) {
         final var id = request.path().split("/")[2];
-        return Response.of()
-                .header("content-type", "application/json")
-                .body(jsonMapper.toString(productService.findProduct(id)))
-                .build();
+        return productService.findProduct(id);
     }
 
     @HttpMatcher(methods = "POST", path = "/order", pathMatching = HttpMatcher.PathMatching.EXACT)
@@ -65,20 +61,14 @@ public class RestEndpoint {
     }
 
     @HttpMatcher(methods = "GET", path = "/order", pathMatching = HttpMatcher.PathMatching.EXACT)
-    public Response findAllOrder(final Request request) {
-        return Response.of()
-                .header("content-type", "application/json")
-                .body(jsonMapper.toString(orderService.findOrders()))
-                .build();
+    public List<Order> findAllOrder(final Request request) {
+        return orderService.findOrders();
     }
 
     @HttpMatcher(methods = "GET", path = "/order/", pathMatching = HttpMatcher.PathMatching.STARTS_WITH)
-    public Response findOrder(final Request request) {
+    public Order findOrder(final Request request) {
         final var id = request.path().split("/")[2];
-        return Response.of()
-                .header("content-type", "application/json")
-                .body(jsonMapper.toString(orderService.findOrder(id)))
-                .build();
+        return orderService.findOrder(id);
     }
 
     @HttpMatcher(methods = "DELETE", path = "/order/", pathMatching = HttpMatcher.PathMatching.STARTS_WITH)
@@ -100,11 +90,8 @@ public class RestEndpoint {
     }
 
     @HttpMatcher(methods = "PATCH", path = "/order/", pathMatching = HttpMatcher.PathMatching.STARTS_WITH)
-    public Response updateOrder(final Request request, final Order order) {
+    public Order updateOrder(final Request request, final Order order) {
         final var id = request.path().split("/")[2];
-        return Response.of()
-                .header("content-type", "application/json")
-                .body(jsonMapper.toString(orderService.updateOrder(id, order)))
-                .build();
+        return orderService.updateOrder(id, order);
     }
 }
