@@ -40,7 +40,7 @@ public class RestEndpoint {
         this.jsonMapper = jsonMapper;
     }
 
-    @HttpMatcher(methods = "GET", path = "/product", pathMatching = HttpMatcher.PathMatching.STARTS_WITH)
+    @HttpMatcher(methods = "GET", path = "/product", pathMatching = HttpMatcher.PathMatching.EXACT)
     public List<Product> findAllProduct(final Request request) {
         return productService.findProducts();
     }
