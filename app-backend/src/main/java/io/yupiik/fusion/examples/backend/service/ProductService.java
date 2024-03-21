@@ -18,10 +18,13 @@ package io.yupiik.fusion.examples.backend.service;
 import io.yupiik.fusion.examples.backend.model.Product;
 import io.yupiik.fusion.framework.api.container.Types;
 import io.yupiik.fusion.framework.api.scope.ApplicationScoped;
+import io.yupiik.fusion.framework.build.api.lifecycle.Init;
 import io.yupiik.fusion.json.JsonMapper;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import static java.util.function.Function.identity;
@@ -29,18 +32,21 @@ import static java.util.stream.Collectors.toMap;
 
 @ApplicationScoped
 public class ProductService {
-
     private final Logger logger = Logger.getLogger(ProductService.class.getName());
 
-    private final ConcurrentHashMap<String, Product> productInventory = new ConcurrentHashMap<>();
+    private final Map<String, Product> productInventory = new LinkedHashMap<>();
 
     private final JsonMapper jsonMapper;
 
-    public ProductService(JsonMapper jsonMapper) {
+    public ProductService(final JsonMapper jsonMapper) {
         this.jsonMapper = jsonMapper;
-        // load productInventory from json file
-        try (final var initProductInventory = ProductService.class.getClassLoader().getResourceAsStream("productInventory.json")) {
-            List<Product> products = jsonMapper.fromBytes(new Types.ParameterizedTypeImpl(List.class, Product.class), initProductInventory.readAllBytes());
+    }
+
+    @Init
+    protected void loadDemoData() {
+        try (final var initProductInventory = ProductService.class.getClassLoader()
+                .getResourceAsStream("productInventory.json")) {
+            final List<Product> products = jsonMapper.fromBytes(new Types.ParameterizedTypeImpl(List.class, Product.class), initProductInventory.readAllBytes());
             productInventory.putAll(products.stream().collect(toMap(Product::id, identity())));
         } catch (final Exception exception) {
             logger.severe("Unable to load product inventory init list from resource file");
@@ -52,6 +58,6 @@ public class ProductService {
     }
 
     public List<Product> findProducts() {
-        return productInventory.values().stream().toList();
+        return new ArrayList<>(productInventory.values());
     }
 }

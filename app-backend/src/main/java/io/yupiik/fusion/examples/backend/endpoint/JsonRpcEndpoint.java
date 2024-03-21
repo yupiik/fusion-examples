@@ -53,7 +53,7 @@ public class JsonRpcEndpoint {
 
     @JsonRpc(value = "fusion.examples.order.create", documentation = "Create a new order")
     public CompletionStage<Order> createOrder(final Request request, final Order order) {
-        return CompletableFuture.completedStage(orderService.createOrder(request, order));
+        return CompletableFuture.completedStage(orderService.createOrder(order));
     }
 
     @JsonRpc(value = "fusion.examples.order.findAll", documentation = "Find all created order")

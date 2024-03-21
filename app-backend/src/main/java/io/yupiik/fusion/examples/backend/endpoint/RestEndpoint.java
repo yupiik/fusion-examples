@@ -56,7 +56,7 @@ public class RestEndpoint {
         return Response.of()
             .status(201)
             .header("content-type", "application/json")
-            .body(jsonMapper.toString(orderService.createOrder(request, order)))
+            .body(jsonMapper.toString(orderService.createOrder(order)))
             .build();
     }
 

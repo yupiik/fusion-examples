@@ -18,21 +18,21 @@ package io.yupiik.fusion.examples.backend.service;
 import io.yupiik.fusion.examples.backend.model.Order;
 import io.yupiik.fusion.examples.backend.model.OrderStatus;
 import io.yupiik.fusion.framework.api.scope.ApplicationScoped;
-import io.yupiik.fusion.http.server.api.Request;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.util.Objects.isNull;
+
 @ApplicationScoped
 public class OrderService {
+    private final Map<String, Order> orderInventory = new ConcurrentHashMap<>();
 
-    private final ConcurrentHashMap<String, Order> orderInventory = new ConcurrentHashMap<>();
-
-    public Order findOrder(String id) {
+    public Order findOrder(final String id) {
         return orderInventory.get(id);
     }
 
@@ -40,22 +40,25 @@ public class OrderService {
         return orderInventory.values().stream().toList();
     }
 
-    public Order createOrder(Request request, Order order) {
-        String newId = UUID.randomUUID().toString();
-        Order newOrder = new Order(
-                newId,
-                order.name(),
-                order.description(),
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                order.products(),
-                OrderStatus.created);
-        orderInventory.putIfAbsent(newId, newOrder);
+    public Order createOrder(final Order order) {
+        String newId;
+        Order newOrder;
+        do {
+            newId = UUID.randomUUID().toString();
+            newOrder = new Order(
+                    newId,
+                    order.name(),
+                    order.description(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    order.products(),
+                    OrderStatus.created);
+        } while (orderInventory.putIfAbsent(newId, newOrder) != null);
         return newOrder;
     }
 
-    public Order updateOrder(String orderId, Order order) {
-        Order updatedOrder = orderInventory.computeIfPresent(orderId, (id, orderData) ->
+    public Order updateOrder(final String orderId, Order order) {
+        final var updatedOrder = orderInventory.computeIfPresent(orderId, (id, orderData) ->
                 new Order(
                         orderData.id(),
                         Optional.ofNullable(order.name()).orElse(orderData.name()),
@@ -64,15 +67,16 @@ public class OrderService {
                         LocalDateTime.now(),
                         Optional.ofNullable(order.products()).orElse(orderData.products()),
                         Optional.ofNullable(order.status()).orElse(orderData.status()))
-                );
+        );
         orderInventory.replace(orderId, updatedOrder);
         return updatedOrder;
     }
 
-    public Order deleteOrder(String orderId) {
-        Order order = orderInventory.get(orderId);
-        if (Objects.isNull(order)) throw new IllegalStateException("Not found");
-        orderInventory.remove(orderId);
+    public Order deleteOrder(final String orderId) {
+        final var order = orderInventory.remove(orderId);
+        if (isNull(order)) {
+            throw new IllegalArgumentException("Not found");
+        }
         return order;
     }
 }

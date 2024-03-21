@@ -15,52 +15,52 @@
  */
 package io.yupiik.fusion.examples.backend.model;
 
-import io.yupiik.fusion.http.server.api.WebServer;
+import io.yupiik.fusion.examples.backend.model.test.TestClient;
+import io.yupiik.fusion.framework.api.container.Types;
 import io.yupiik.fusion.testing.Fusion;
-import io.yupiik.fusion.testing.FusionSupport;
+import io.yupiik.fusion.testing.MonoFusionSupport;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.List;
 
-import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@FusionSupport
+@MonoFusionSupport
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RestProductInventoryTests {
 
     private final HttpClient client = HttpClient.newHttpClient();
 
     @Test
-    void findProduct(@Fusion final WebServer.Configuration configuration) throws IOException, InterruptedException {
+    void findProduct(@Fusion final TestClient client) {
         final var res = client.send(
-                HttpRequest.newBuilder()
+                uri -> HttpRequest.newBuilder()
                         .GET()
-                        .uri(URI.create("http://localhost:" + configuration.port() + "/product/123456789")).build(),
-                ofString());
+                        .uri(uri.resolve("/product/123456789"))
+                        .build(),
+                Product.class);
         assertAll(
                 () -> assertEquals(200, res.statusCode()),
-                () -> assertTrue(res.body().contains("\"id\":\"123456789\""), res::body)
-        );
+                () -> assertEquals("123456789", res.body().id(), () -> res.body().toString()));
     }
 
     @Test
-    void findProducts(@Fusion final WebServer.Configuration configuration) throws IOException, InterruptedException {
-        final var res = client.send(
-                HttpRequest.newBuilder()
+    void findProducts(@Fusion final TestClient client) {
+        final HttpResponse<List<Product>> res = client.send(
+                uri -> HttpRequest.newBuilder()
                         .GET()
-                        .uri(URI.create("http://localhost:" + configuration.port() + "/product")).build(),
-                ofString());
+                        .uri(uri.resolve("/product"))
+                        .build(),
+                new Types.ParameterizedTypeImpl(List.class, Product.class));
         assertAll(
                 () -> assertEquals(200, res.statusCode()),
-                () -> assertTrue(res.body().contains("\"id\":\"123456789\""), res::body)
-        );
+                () -> assertEquals(2, res.body().size()),
+                () -> assertEquals("123456789", res.body().getFirst().id(), () -> res.body().toString()));
     }
 }
