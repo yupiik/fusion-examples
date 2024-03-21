@@ -125,7 +125,7 @@ public class TestClient implements AutoCloseable {
         private final JsonRpcResponse response;
         private final JsonMapper jsonMapper;
 
-        public <A> JsonRpc(final JsonRpcResponse response, final JsonMapper jsonMapper) {
+        public JsonRpc(final JsonRpcResponse response, final JsonMapper jsonMapper) {
             this.response = response;
             this.jsonMapper = jsonMapper;
         }
