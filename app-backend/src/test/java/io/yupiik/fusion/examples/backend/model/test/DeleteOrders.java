@@ -15,8 +15,24 @@
  */
 package io.yupiik.fusion.examples.backend.model.test;
 
-/**
- * @param value when using @Data(INSERT_ORDER) the id of the inserted order.
- */
-public record OrderId(String value) {
+import io.yupiik.fusion.examples.backend.model.Order;
+import io.yupiik.fusion.examples.backend.service.OrderService;
+import io.yupiik.fusion.framework.api.scope.DefaultScoped;
+import io.yupiik.fusion.testing.task.Task;
+
+@DefaultScoped
+public class DeleteOrders implements Task.Supplier<String> {
+    private final OrderService service;
+
+    public DeleteOrders(final OrderService service) {
+        this.service = service;
+    }
+
+    @Override
+    public void run() {
+        service.findOrders()
+                .stream()
+                .map(Order::id)
+                .forEach(service::deleteOrder);
+    }
 }
