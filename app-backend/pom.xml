@@ -106,6 +106,47 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <proc>none</proc>
+                    <useIncrementalCompilation>false</useIncrementalCompilation>
+                    <annotationProcessors>
+                        <annotationProcessor>io.yupiik.fusion.framework.processor.FusionProcessor</annotationProcessor>
+                    </annotationProcessors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-process-annotations</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <proc>only</proc>
+                            <useIncrementalCompilation>true</useIncrementalCompilation>
+                            <compilerArgs>
+                                <compilerArg>-Afusion.moduleFqn=io.yupiik.fusion.examples.ExampleModule</compilerArg>
+                            </compilerArgs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-test-process-annotations</id>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <proc>only</proc>
+                            <useIncrementalCompilation>true</useIncrementalCompilation>
+                            <compilerArgs>
+                                <compilerArg>-Afusion.moduleFqn=io.yupiik.fusion.examples.ExampleTestModule</compilerArg>
+                            </compilerArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin><!-- mvn exec:java -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -123,7 +164,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
                 <configuration>
                     <trimStackTrace>false</trimStackTrace>
                     <systemPropertyVariables>

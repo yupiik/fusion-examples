@@ -15,4 +15,10 @@
  */
 package io.yupiik.fusion.examples.backend.model;
 
-public record Error(String message){}
+import io.yupiik.fusion.framework.build.api.configuration.Property;
+import io.yupiik.fusion.framework.build.api.json.JsonModel;
+
+@JsonModel
+public record Error(
+        @Property(documentation = "The error message.")
+        String message){}

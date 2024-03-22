@@ -15,6 +15,7 @@
  */
 package io.yupiik.fusion.examples.backend.service;
 
+import io.yupiik.fusion.examples.backend.configuration.BackendConfiguration;
 import io.yupiik.fusion.examples.backend.model.Product;
 import io.yupiik.fusion.framework.api.container.Types;
 import io.yupiik.fusion.framework.api.scope.ApplicationScoped;
@@ -34,18 +35,20 @@ import static java.util.stream.Collectors.toMap;
 public class ProductService {
     private final Logger logger = Logger.getLogger(ProductService.class.getName());
 
+    private final BackendConfiguration configuration;
     private final Map<String, Product> productInventory = new LinkedHashMap<>();
 
     private final JsonMapper jsonMapper;
 
-    public ProductService(final JsonMapper jsonMapper) {
+    public ProductService(final BackendConfiguration configuration, final JsonMapper jsonMapper) {
+        this.configuration = configuration;
         this.jsonMapper = jsonMapper;
     }
 
     @Init
     protected void loadDemoData() {
         try (final var initProductInventory = ProductService.class.getClassLoader()
-                .getResourceAsStream("productInventory.json")) {
+                .getResourceAsStream(configuration.productInventoryResource())) {
             final List<Product> products = jsonMapper.fromBytes(new Types.ParameterizedTypeImpl(List.class, Product.class), initProductInventory.readAllBytes());
             productInventory.putAll(products.stream().collect(toMap(Product::id, identity())));
         } catch (final Exception exception) {

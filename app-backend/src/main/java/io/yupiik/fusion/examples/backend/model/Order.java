@@ -15,6 +15,7 @@
  */
 package io.yupiik.fusion.examples.backend.model;
 
+import io.yupiik.fusion.framework.build.api.configuration.Property;
 import io.yupiik.fusion.framework.build.api.json.JsonModel;
 
 import java.time.LocalDate;
@@ -23,10 +24,11 @@ import java.util.List;
 
 @JsonModel
 public record Order(
-  String id,
-  String description,
-  String name,
-  LocalDateTime creationDate,
-  LocalDateTime lastUpdateDate,
-  List<Product> products,
-  OrderStatus status){}
+        @Property(documentation = "Order identifier.") String id,
+        @Property(documentation = "Order description.") String description,
+        @Property(documentation = "Order name.") String name,
+        @Property(documentation = "Order creation date.") LocalDateTime creationDate,
+        @Property(documentation = "Order last update date.") LocalDateTime lastUpdateDate,
+        @Property(documentation = "Order related products.") List<Product> products,
+        @Property(documentation = "Order status.") OrderStatus status) {
+}
