@@ -15,38 +15,40 @@
  */
 package io.yupiik.fusion.examples.backend.model;
 
-import io.yupiik.fusion.http.server.api.WebServer;
-import io.yupiik.fusion.json.JsonMapper;
+import io.yupiik.fusion.examples.backend.model.test.Data;
+import io.yupiik.fusion.examples.backend.model.test.OrderId;
+import io.yupiik.fusion.examples.backend.service.OrderService;
+import io.yupiik.fusion.framework.api.container.Types;
 import io.yupiik.fusion.testing.Fusion;
-import io.yupiik.fusion.testing.FusionSupport;
+import io.yupiik.fusion.testing.MonoFusionSupport;
+import io.yupiik.fusion.testing.http.TestClient;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.List;
 
-import static java.net.http.HttpResponse.BodyHandlers.ofString;
+import static io.yupiik.fusion.examples.backend.model.OrderStatus.pendingActive;
+import static io.yupiik.fusion.examples.backend.model.test.Data.Phase.AFTER;
+import static io.yupiik.fusion.examples.backend.model.test.Data.Phase.BEFORE;
+import static io.yupiik.fusion.examples.backend.model.test.Data.Type.INSERT_ORDER;
+import static io.yupiik.fusion.examples.backend.model.test.Data.Type.RESTORE_STATE;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@FusionSupport
+@MonoFusionSupport
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RestMobileLineTests {
-
-    private final HttpClient client = HttpClient.newHttpClient();
-    private static final AtomicReference<String> id = new AtomicReference<>("xxx");
-
     @Test
-    @org.junit.jupiter.api.Order(1)
-    void createOrder(@Fusion final WebServer.Configuration configuration, @Fusion JsonMapper jsonMapper) throws IOException, InterruptedException {
+    @Data(phase = AFTER, type = RESTORE_STATE)
+    void createOrder(@Fusion final TestClient client) {
         final var res = client.send(
-                HttpRequest.newBuilder()
+                uri -> HttpRequest.newBuilder()
                         .POST(HttpRequest.BodyPublishers.ofString("""
                                 {
                                      "description": "Mobile Line",
@@ -65,86 +67,79 @@ public class RestMobileLineTests {
                                      ]
                                  }
                                 """, StandardCharsets.UTF_8))
-                        .uri(URI.create("http://localhost:" + configuration.port() + "/order")).build(),
-                ofString());
+                        .uri(uri.resolve("/order"))
+                        .build(),
+                String.class);
         assertAll(
                 () -> assertEquals(201, res.statusCode()),
-                () -> assertTrue(res.body().contains("\"status\":\"created\""), res::body)
-        );
-        id.getAndSet(jsonMapper.fromString(Order.class, res.body()).id());
+                () -> assertTrue(res.body().contains("\"status\":\"created\""), res::body));
     }
 
     @Test
-    @org.junit.jupiter.api.Order(2)
-    void getOrder(@Fusion final WebServer.Configuration configuration) throws IOException, InterruptedException {
-        final var res = client.send(
-                HttpRequest.newBuilder()
-                        .GET()
-                        .uri(URI.create("http://localhost:" + configuration.port() + "/order/" + id.get())).build(),
-                ofString());
-        assertAll(
-                () -> assertEquals(200, res.statusCode()),
-                () -> assertTrue(res.body().contains("\"id\":\"" + id.get() + "\""), res::body)
-        );
-    }
-
-    @Test
-    @org.junit.jupiter.api.Order(3)
-    void findOrders(@Fusion final WebServer.Configuration configuration) throws IOException, InterruptedException {
-        final var res = client.send(
-                HttpRequest.newBuilder()
-                        .GET()
-                        .uri(URI.create("http://localhost:" + configuration.port() + "/order")).build(),
-                ofString());
-        assertAll(
-                () -> assertEquals(200, res.statusCode()),
-                () -> assertTrue(res.body().contains("\"id\":\"" + id.get() + "\""), res::body)
-        );
-    }
-
-    @Test
-    @org.junit.jupiter.api.Order(4)
-    void updateOrder(@Fusion final WebServer.Configuration configuration, @Fusion JsonMapper jsonMapper) throws IOException, InterruptedException {
+    @Data(phase = BEFORE, type = INSERT_ORDER)
+    @Data(phase = AFTER, type = RESTORE_STATE)
+    void getOrder(@Fusion final TestClient client, final OrderId id) {
         final var get = client.send(
-                HttpRequest.newBuilder()
+                uri -> HttpRequest.newBuilder()
                         .GET()
-                        .uri(URI.create("http://localhost:" + configuration.port() + "/order/" + id.get())).build(),
-                ofString());
+                        .uri(uri.resolve("/order/" + id.value()))
+                        .build(),
+                Order.class);
         assertAll(
                 () -> assertEquals(200, get.statusCode()),
-                () -> assertTrue(get.body().contains("\"id\":\"" + id.get() + "\""), get::body)
-        );
+                () -> assertEquals(id.value(), get.body().id(), () -> get.body().toString()));
+    }
 
-        final var order = jsonMapper.fromString(Order.class, get.body());
+    @Test
+    @Data(phase = BEFORE, type = INSERT_ORDER)
+    @Data(phase = AFTER, type = RESTORE_STATE)
+    void findOrders(@Fusion final TestClient client, final OrderId id) {
+        final HttpResponse<List<Order>> res = client.send(
+                uri -> HttpRequest.newBuilder()
+                        .GET()
+                        .uri(uri.resolve("/order"))
+                        .build(),
+                new Types.ParameterizedTypeImpl(List.class, Order.class));
+        assertAll(
+                () -> assertEquals(200, res.statusCode()),
+                () -> assertEquals(1, res.body().size(), res.statusCode()),
+                () -> assertEquals(id.value(), res.body().getFirst().id(), () -> res.body().toString()));
+    }
 
+    @Test
+    @Data(phase = BEFORE, type = INSERT_ORDER)
+    @Data(phase = AFTER, type = RESTORE_STATE)
+    void updateOrder(@Fusion final TestClient client, final OrderId id) {
         final var res = client.send(
-                HttpRequest.newBuilder()
+                uri -> HttpRequest.newBuilder()
                         .method("PATCH",
                                 HttpRequest.BodyPublishers.ofString("""
                                         {
                                              "status": "pendingActive"
                                          }
                                         """, StandardCharsets.UTF_8)
-                                )
-                        .uri(URI.create("http://localhost:" + configuration.port() + "/order/" + order.id())).build(),
-                ofString());
+                        )
+                        .uri(uri.resolve("/order/" + id.value()))
+                        .build(),
+                Order.class);
         assertAll(
                 () -> assertEquals(200, res.statusCode()),
-                () -> assertTrue(res.body().contains("\"id\":\"" + id.get() + "\""), res::body),
-                () -> assertTrue(res.body().contains("\"status\":\"pendingActive\""), res::body)
-        );
+                () -> assertEquals(id.value(), res.body().id(), () -> res.body().toString()),
+                () -> assertEquals(pendingActive, res.body().status(), () -> res.body().toString()));
     }
 
     @Test
-    @org.junit.jupiter.api.Order(5)
-    void deleteOrder(@Fusion final WebServer.Configuration configuration) throws IOException, InterruptedException {
+    @Data(phase = BEFORE, type = INSERT_ORDER)
+    @Data(phase = AFTER, type = RESTORE_STATE)
+    void deleteOrder(@Fusion final TestClient client, final OrderId id, @Fusion final OrderService service) {
         final var res = client.send(
-                HttpRequest.newBuilder()
+                uri -> HttpRequest.newBuilder()
                         .DELETE()
-                        .uri(URI.create("http://localhost:" + configuration.port() + "/order/" + id.get())).build(),
-                ofString());
+                        .uri(uri.resolve("/order/" + id.value()))
+                        .build(),
+                String.class);
         assertAll(
-                () -> assertEquals(204, res.statusCode())
-        );
+                () -> assertEquals(204, res.statusCode()),
+                () -> assertNull(service.findOrder(id.value())));
     }
 }

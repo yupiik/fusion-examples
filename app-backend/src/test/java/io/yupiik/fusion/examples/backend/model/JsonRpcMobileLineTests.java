@@ -15,146 +15,106 @@
  */
 package io.yupiik.fusion.examples.backend.model;
 
-import io.yupiik.fusion.framework.build.api.json.JsonModel;
-import io.yupiik.fusion.http.server.api.WebServer;
-import io.yupiik.fusion.json.JsonMapper;
+import io.yupiik.fusion.examples.backend.model.test.Data;
+import io.yupiik.fusion.examples.backend.model.test.OrderId;
+import io.yupiik.fusion.examples.backend.service.OrderService;
 import io.yupiik.fusion.testing.Fusion;
-import io.yupiik.fusion.testing.FusionSupport;
+import io.yupiik.fusion.testing.MonoFusionSupport;
+import io.yupiik.fusion.testing.http.TestClient;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
-import static java.net.http.HttpResponse.BodyHandlers.ofString;
+import static io.yupiik.fusion.examples.backend.model.OrderStatus.created;
+import static io.yupiik.fusion.examples.backend.model.test.Data.Phase.AFTER;
+import static io.yupiik.fusion.examples.backend.model.test.Data.Phase.BEFORE;
+import static io.yupiik.fusion.examples.backend.model.test.Data.Type.INSERT_ORDER;
+import static io.yupiik.fusion.examples.backend.model.test.Data.Type.RESTORE_STATE;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@FusionSupport
+@MonoFusionSupport
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class JsonRpcMobileLineTests {
-
-    private final HttpClient client = HttpClient.newHttpClient();
-    private static final AtomicReference<String> id = new AtomicReference<>("xxx");
-
     @Test
-    @org.junit.jupiter.api.Order(1)
-    void createOrder(@Fusion final WebServer.Configuration configuration, @Fusion JsonMapper jsonMapper) throws IOException, InterruptedException {
-        final var res = client.send(
-                HttpRequest.newBuilder()
-                        .POST(HttpRequest.BodyPublishers.ofString("""
-                                {
-                                    "jsonrpc": "2.0",
-                                    "id": "xxx1",
-                                    "method": "fusion.examples.order.create",
-                                    "params": {
-                                        "order": {
-                                                     "description": "Mobile Line",
-                                                     "name": "Mobile Line",
-                                                     "products": [
-                                                        {
-                                                            "id": "123456789",
-                                                            "name": "Mobile Line",
-                                                            "description": "Mobile Line with MSISDN"
-                                                        },
-                                                        {
-                                                            "id": "987654321",
-                                                            "name": "Device Phone",
-                                                            "description": "Phone Device X Model Alpha GT"
-                                                        }
-                                                     ]
-                                                 }
-                                    }
-                                }
-                                """, StandardCharsets.UTF_8))
-                        .uri(URI.create("http://localhost:" + configuration.port() + "/jsonrpc")).build(),
-                ofString());
+    @Data(phase = AFTER, type = RESTORE_STATE)
+    void createOrder(@Fusion final TestClient client) {
+        final var res = client.jsonRpcRequest(
+                "fusion.examples.order.create",
+                Map.of("order", Map.of(
+                        "description", "Mobile Line",
+                        "name", "Mobile Line",
+                        "products", List.of(
+                                Map.of(
+                                        "id", "123456789",
+                                        "name", "Mobile Line",
+                                        "description", "Mobile Line with MSISDN"
+                                ),
+                                Map.of(
+                                        "id", "987654321",
+                                        "name", "Device Phone",
+                                        "description", "Phone Device X Model Alpha GT"
+                                )))));
+
+        final var order = res.asJsonRpc().success().as(Order.class);
         assertAll(
                 () -> assertEquals(200, res.statusCode()),
-                () -> assertTrue(res.body().contains("\"status\":\"created\""), res::body),
-                () -> assertTrue(res.body().contains("\"id\":\"xxx1\""), res::body)
-        );
-        final var response = jsonMapper.fromString(JsonRpcResponse.class, res.body());
-        final var orderId = ((LinkedHashMap<?, ?>) response.result).get("id").toString();
-        id.getAndSet(orderId);
+                () -> assertEquals(created, order.status(), res::body),
+                () -> assertNotNull(order.id(), res::body));
     }
 
     @Test
-    @org.junit.jupiter.api.Order(2)
-    void getOrder(@Fusion final WebServer.Configuration configuration) throws IOException, InterruptedException {
-        final var res = client.send(
-                HttpRequest.newBuilder()
-                        .POST(HttpRequest.BodyPublishers.ofString("{\n" +
-                                "    \"jsonrpc\": \"2.0\",\n" +
-                                "    \"id\": \"xxx2\",\n" +
-                                "    \"method\": \"fusion.examples.order.findById\",\n" +
-                                "    \"params\": {\n" +
-                                "        \"id\": \"" + id.get() + "\"\n" +
-                                "    }\n" +
-                                "}", StandardCharsets.UTF_8))
-                        .uri(URI.create("http://localhost:" + configuration.port() + "/jsonrpc")).build(),
-                ofString());
+    @Data(phase = BEFORE, type = INSERT_ORDER)
+    @Data(phase = AFTER, type = RESTORE_STATE)
+    void getOrder(@Fusion final TestClient client, final OrderId id) {
+        final var res = client.jsonRpcRequest(
+                "fusion.examples.order.findById",
+                Map.of("id", id.value()));
+
+        final var order = res.asJsonRpc().success().as(Order.class);
         assertAll(
                 () -> assertEquals(200, res.statusCode()),
-                () -> assertTrue(res.body().contains("\"id\":\"" + id.get() + "\""), res::body),
-                () -> assertTrue(res.body().contains("\"id\":\"xxx2\""), res::body)
-        );
+                () -> assertInsertedOrder(order, id, res::body));
     }
 
     @Test
-    @org.junit.jupiter.api.Order(3)
-    void findOrders(@Fusion final WebServer.Configuration configuration) throws IOException, InterruptedException {
-        final var res = client.send(
-                HttpRequest.newBuilder()
-                        .POST(HttpRequest.BodyPublishers.ofString("""
-                                {
-                                    "jsonrpc": "2.0",
-                                    "id": "xxx3",
-                                    "method": "fusion.examples.order.findAll"
-                                }
-                                """, StandardCharsets.UTF_8))
-                        .uri(URI.create("http://localhost:" + configuration.port() + "/jsonrpc")).build(),
-                ofString());
+    @Data(phase = BEFORE, type = INSERT_ORDER)
+    @Data(phase = AFTER, type = RESTORE_STATE)
+    void findOrders(@Fusion final TestClient client, final OrderId id) {
+        final var res = client.jsonRpcRequest("fusion.examples.order.findAll", Map.of());
+
+        final var orders = res.asJsonRpc().success().asList(Order.class);
         assertAll(
                 () -> assertEquals(200, res.statusCode()),
-                () -> assertTrue(res.body().contains("\"status\":\"created\""), res::body),
-                () -> assertTrue(res.body().contains("\"id\":\"xxx3\""), res::body)
-        );
+                () -> assertEquals(1, orders.size()),
+                () -> assertInsertedOrder(orders.getFirst(), id, res::body));
     }
 
     @Test
-    @org.junit.jupiter.api.Order(4)
-    void deleteOrder(@Fusion final WebServer.Configuration configuration) throws IOException, InterruptedException {
-        final var res = client.send(
-                HttpRequest.newBuilder()
-                        .POST(HttpRequest.BodyPublishers.ofString("{\n" +
-                                "    \"jsonrpc\": \"2.0\",\n" +
-                                "    \"id\": \"xxx4\",\n" +
-                                "    \"method\": \"fusion.examples.order.delete\",\n" +
-                                "    \"params\": {\n" +
-                                "        \"id\": \"" + id.get() + "\"\n" +
-                                "    }\n" +
-                                "}", StandardCharsets.UTF_8))
-                        .uri(URI.create("http://localhost:" + configuration.port() + "/jsonrpc")).build(),
-                ofString());
+    @Data(phase = BEFORE, type = INSERT_ORDER)
+    @Data(phase = AFTER, type = RESTORE_STATE)
+    void deleteOrder(@Fusion final TestClient client, final OrderId id, @Fusion final OrderService service) {
+        final var res = client.jsonRpcRequest(
+                "fusion.examples.order.delete",
+                Map.of("id", id.value()));
+
+        final var order = res.asJsonRpc().success().as(Order.class);
         assertAll(
-                () -> assertEquals(200, res.statusCode()),
-                () -> assertTrue(res.body().contains("\"id\":\"" + id.get() + "\""), res::body),
-                () -> assertTrue(res.body().contains("\"id\":\"xxx4\""), res::body)
-        );
+                () -> assertInsertedOrder(order, id, res::body),
+                () -> assertTrue(service.findOrders().isEmpty(), () -> service.findOrders().toString()));
     }
 
-    @JsonModel
-    record JsonRpcResponse(String jsonrpc, String id, Object result, Error error){
-
-        @JsonModel
-        record Error(Integer code, String message){}
+    private void assertInsertedOrder(final Order order, final OrderId id, final Supplier<String> debug) {
+        assertAll(
+                () -> assertEquals(id.value(), order.id(), debug),
+                () -> assertEquals("description", order.name(), debug),
+                () -> assertEquals("Mobile Line", order.description(), debug),
+                () -> assertEquals(2, order.products().size(), debug));
     }
 }
