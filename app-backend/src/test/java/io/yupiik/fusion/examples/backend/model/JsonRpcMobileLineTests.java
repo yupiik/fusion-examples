@@ -15,12 +15,14 @@
  */
 package io.yupiik.fusion.examples.backend.model;
 
-import io.yupiik.fusion.examples.backend.model.test.Data;
-import io.yupiik.fusion.examples.backend.model.test.OrderId;
+import io.yupiik.fusion.examples.backend.model.test.CreateOrder;
+import io.yupiik.fusion.examples.backend.model.test.DeleteOrders;
 import io.yupiik.fusion.examples.backend.service.OrderService;
 import io.yupiik.fusion.testing.Fusion;
 import io.yupiik.fusion.testing.MonoFusionSupport;
 import io.yupiik.fusion.testing.http.TestClient;
+import io.yupiik.fusion.testing.task.Task;
+import io.yupiik.fusion.testing.task.TaskResult;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -30,10 +32,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static io.yupiik.fusion.examples.backend.model.OrderStatus.created;
-import static io.yupiik.fusion.examples.backend.model.test.Data.Phase.AFTER;
-import static io.yupiik.fusion.examples.backend.model.test.Data.Phase.BEFORE;
-import static io.yupiik.fusion.examples.backend.model.test.Data.Type.INSERT_ORDER;
-import static io.yupiik.fusion.examples.backend.model.test.Data.Type.RESTORE_STATE;
+import static io.yupiik.fusion.testing.task.Task.Phase.AFTER;
+import static io.yupiik.fusion.testing.task.Task.Phase.BEFORE;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class JsonRpcMobileLineTests {
     @Test
-    @Data(phase = AFTER, type = RESTORE_STATE)
+    @Task(phase = AFTER, value = DeleteOrders.class)
     void createOrder(@Fusion final TestClient client) {
         final var res = client.jsonRpcRequest(
                 "fusion.examples.order.create",
@@ -70,12 +70,12 @@ public class JsonRpcMobileLineTests {
     }
 
     @Test
-    @Data(phase = BEFORE, type = INSERT_ORDER)
-    @Data(phase = AFTER, type = RESTORE_STATE)
-    void getOrder(@Fusion final TestClient client, final OrderId id) {
+    @Task(phase = BEFORE, value = CreateOrder.class)
+    @Task(phase = AFTER, value = DeleteOrders.class)
+    void getOrder(@Fusion final TestClient client, @TaskResult(CreateOrder.class) final String id) {
         final var res = client.jsonRpcRequest(
                 "fusion.examples.order.findById",
-                Map.of("id", id.value()));
+                Map.of("id", id));
 
         final var order = res.asJsonRpc().success().as(Order.class);
         assertAll(
@@ -84,9 +84,9 @@ public class JsonRpcMobileLineTests {
     }
 
     @Test
-    @Data(phase = BEFORE, type = INSERT_ORDER)
-    @Data(phase = AFTER, type = RESTORE_STATE)
-    void findOrders(@Fusion final TestClient client, final OrderId id) {
+    @Task(phase = BEFORE, value = CreateOrder.class)
+    @Task(phase = AFTER, value = DeleteOrders.class)
+    void findOrders(@Fusion final TestClient client, @TaskResult(CreateOrder.class) final String id) {
         final var res = client.jsonRpcRequest("fusion.examples.order.findAll", Map.of());
 
         final var orders = res.asJsonRpc().success().asList(Order.class);
@@ -97,12 +97,12 @@ public class JsonRpcMobileLineTests {
     }
 
     @Test
-    @Data(phase = BEFORE, type = INSERT_ORDER)
-    @Data(phase = AFTER, type = RESTORE_STATE)
-    void deleteOrder(@Fusion final TestClient client, final OrderId id, @Fusion final OrderService service) {
+    @Task(phase = BEFORE, value = CreateOrder.class)
+    @Task(phase = AFTER, value = DeleteOrders.class)
+    void deleteOrder(@Fusion final TestClient client, @TaskResult(CreateOrder.class) final String id, @Fusion final OrderService service) {
         final var res = client.jsonRpcRequest(
                 "fusion.examples.order.delete",
-                Map.of("id", id.value()));
+                Map.of("id", id));
 
         final var order = res.asJsonRpc().success().as(Order.class);
         assertAll(
@@ -110,9 +110,9 @@ public class JsonRpcMobileLineTests {
                 () -> assertTrue(service.findOrders().isEmpty(), () -> service.findOrders().toString()));
     }
 
-    private void assertInsertedOrder(final Order order, final OrderId id, final Supplier<String> debug) {
+    private void assertInsertedOrder(final Order order, @TaskResult(CreateOrder.class) final String id, final Supplier<String> debug) {
         assertAll(
-                () -> assertEquals(id.value(), order.id(), debug),
+                () -> assertEquals(id, order.id(), debug),
                 () -> assertEquals("description", order.name(), debug),
                 () -> assertEquals("Mobile Line", order.description(), debug),
                 () -> assertEquals(2, order.products().size(), debug));
