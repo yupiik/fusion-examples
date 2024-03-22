@@ -15,15 +15,14 @@
  */
 package io.yupiik.fusion.examples.backend.model;
 
-import io.yupiik.fusion.examples.backend.model.test.TestClient;
 import io.yupiik.fusion.framework.api.container.Types;
 import io.yupiik.fusion.testing.Fusion;
 import io.yupiik.fusion.testing.MonoFusionSupport;
+import io.yupiik.fusion.testing.http.TestClient;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
@@ -34,9 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @MonoFusionSupport
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RestProductInventoryTests {
-
-    private final HttpClient client = HttpClient.newHttpClient();
-
     @Test
     void findProduct(@Fusion final TestClient client) {
         final var res = client.send(

@@ -17,11 +17,11 @@ package io.yupiik.fusion.examples.backend.model;
 
 import io.yupiik.fusion.examples.backend.model.test.Data;
 import io.yupiik.fusion.examples.backend.model.test.OrderId;
-import io.yupiik.fusion.examples.backend.model.test.TestClient;
 import io.yupiik.fusion.examples.backend.service.OrderService;
 import io.yupiik.fusion.framework.api.container.Types;
 import io.yupiik.fusion.testing.Fusion;
 import io.yupiik.fusion.testing.MonoFusionSupport;
+import io.yupiik.fusion.testing.http.TestClient;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;

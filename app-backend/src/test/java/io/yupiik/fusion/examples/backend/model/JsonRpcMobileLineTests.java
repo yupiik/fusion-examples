@@ -17,10 +17,10 @@ package io.yupiik.fusion.examples.backend.model;
 
 import io.yupiik.fusion.examples.backend.model.test.Data;
 import io.yupiik.fusion.examples.backend.model.test.OrderId;
-import io.yupiik.fusion.examples.backend.model.test.TestClient;
 import io.yupiik.fusion.examples.backend.service.OrderService;
 import io.yupiik.fusion.testing.Fusion;
 import io.yupiik.fusion.testing.MonoFusionSupport;
+import io.yupiik.fusion.testing.http.TestClient;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -45,7 +45,7 @@ public class JsonRpcMobileLineTests {
     @Test
     @Data(phase = AFTER, type = RESTORE_STATE)
     void createOrder(@Fusion final TestClient client) {
-        final var res = client.jsonRpc(
+        final var res = client.jsonRpcRequest(
                 "fusion.examples.order.create",
                 Map.of("order", Map.of(
                         "description", "Mobile Line",
@@ -62,7 +62,7 @@ public class JsonRpcMobileLineTests {
                                         "description", "Phone Device X Model Alpha GT"
                                 )))));
 
-        final var order = res.jsonRpc().success().as(Order.class);
+        final var order = res.asJsonRpc().success().as(Order.class);
         assertAll(
                 () -> assertEquals(200, res.statusCode()),
                 () -> assertEquals(created, order.status(), res::body),
@@ -73,11 +73,11 @@ public class JsonRpcMobileLineTests {
     @Data(phase = BEFORE, type = INSERT_ORDER)
     @Data(phase = AFTER, type = RESTORE_STATE)
     void getOrder(@Fusion final TestClient client, final OrderId id) {
-        final var res = client.jsonRpc(
+        final var res = client.jsonRpcRequest(
                 "fusion.examples.order.findById",
                 Map.of("id", id.value()));
 
-        final var order = res.jsonRpc().success().as(Order.class);
+        final var order = res.asJsonRpc().success().as(Order.class);
         assertAll(
                 () -> assertEquals(200, res.statusCode()),
                 () -> assertInsertedOrder(order, id, res::body));
@@ -87,9 +87,9 @@ public class JsonRpcMobileLineTests {
     @Data(phase = BEFORE, type = INSERT_ORDER)
     @Data(phase = AFTER, type = RESTORE_STATE)
     void findOrders(@Fusion final TestClient client, final OrderId id) {
-        final var res = client.jsonRpc("fusion.examples.order.findAll", Map.of());
+        final var res = client.jsonRpcRequest("fusion.examples.order.findAll", Map.of());
 
-        final var orders = res.jsonRpc().success().asList(Order.class);
+        final var orders = res.asJsonRpc().success().asList(Order.class);
         assertAll(
                 () -> assertEquals(200, res.statusCode()),
                 () -> assertEquals(1, orders.size()),
@@ -100,11 +100,11 @@ public class JsonRpcMobileLineTests {
     @Data(phase = BEFORE, type = INSERT_ORDER)
     @Data(phase = AFTER, type = RESTORE_STATE)
     void deleteOrder(@Fusion final TestClient client, final OrderId id, @Fusion final OrderService service) {
-        final var res = client.jsonRpc(
+        final var res = client.jsonRpcRequest(
                 "fusion.examples.order.delete",
                 Map.of("id", id.value()));
 
-        final var order = res.jsonRpc().success().as(Order.class);
+        final var order = res.asJsonRpc().success().as(Order.class);
         assertAll(
                 () -> assertInsertedOrder(order, id, res::body),
                 () -> assertTrue(service.findOrders().isEmpty(), () -> service.findOrders().toString()));
