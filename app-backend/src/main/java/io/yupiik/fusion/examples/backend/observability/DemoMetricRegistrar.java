@@ -55,7 +55,8 @@ public class DemoMetricRegistrar {
         // add a custom metric
         tomcatConf.setContextCustomizers(List.of(ctx -> customize(ctx, registry)));
         // enable tracing (zipkin/jaeger)
-        tomcatConf.setTomcatCustomizers(List.of(t -> enableTracing(t, conf, json)));
+        tomcatConf.setTomcatCustomizers(List.of(
+                t -> enableTracing(t, conf, json)));
     }
 
     private void enableTracing(final Tomcat tomcat, final BackendConfiguration conf, final JsonMapper json) {
@@ -73,6 +74,8 @@ public class DemoMetricRegistrar {
 
     private void customize(final Context app, final MetricsRegistry registry) {
         // add a servlet filter to count requests - for the demo
+        // can also be the evaluator:
+        // () -> ((AbstractProtocol<?>) tomcat.getConnector().getProtocolHandler()).getHandler().getGlobal().getRequestCount()
         final var counter = new LongAdder();
         app.addServletContainerInitializer((c, ctx) ->
                 ctx.addFilter("request-counter", (request, response, chain) -> {
@@ -80,6 +83,7 @@ public class DemoMetricRegistrar {
                             chain.doFilter(request, response);
                         })
                         .addMappingForUrlPatterns(EnumSet.of(REQUEST), false, "/*"), Set.of());
+
 
         // register the counter as a gauge
         registry.registerReadOnlyGauge("backend_request_count", "none", counter::sum);
