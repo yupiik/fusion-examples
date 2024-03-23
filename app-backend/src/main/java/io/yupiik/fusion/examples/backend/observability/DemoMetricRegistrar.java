@@ -58,20 +58,16 @@ public class DemoMetricRegistrar {
         tomcatConf.setTomcatCustomizers(List.of(t -> enableTracing(t, conf, json)));
     }
 
-    @SuppressWarnings("resource") // collector is closed by the valve there
     private void enableTracing(final Tomcat tomcat, final BackendConfiguration conf, final JsonMapper json) {
         // just add the tracing valve to the tomcat host
-        final var tracingValve = new TracingValve(
-                new ServerTracingConfiguration()
-                        .setOperation("tomcat")
-                        .setServiceName("fusion-backend"),
-                new AccumulatingSpanCollector(new AccumulatingSpanCollector.Configuration()
-                        .setFlushInterval(5_000L))
-                        .setOnFlush(new ZipkinFlusher(json, newHttpClient(), new ZipkinFlusherConfiguration()
-                                .setUrls(List.of(conf.zipkin())))),
-                new IdGenerator(HEX),
-                systemUTC(),
-                true);
+        final var serverSpanConfiguration = new ServerTracingConfiguration()
+                .setOperation("tomcat")
+                .setServiceName("fusion-backend");
+        final var spanCollector = new AccumulatingSpanCollector(new AccumulatingSpanCollector.Configuration()
+                .setFlushInterval(5_000L))
+                .setOnFlush(new ZipkinFlusher(json, newHttpClient(), new ZipkinFlusherConfiguration()
+                        .setUrls(List.of(conf.zipkin()))));
+        final var tracingValve = new TracingValve(serverSpanConfiguration, spanCollector, new IdGenerator(HEX), systemUTC(), true);
         tomcat.getHost().getPipeline().addValve(tracingValve);
     }
 
