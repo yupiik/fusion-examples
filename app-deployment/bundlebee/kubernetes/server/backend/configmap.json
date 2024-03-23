@@ -21,6 +21,6 @@
   "data": {
     "APPLICATION_ENVIRONMENT":"{{app.environment:-development}}",
     "_DEPLOY_TIME":"{{app.deploytime:-unset}}",
-    "_JAVA_OPTIONS": "-XX:+ExitOnOutOfMemoryError -XX:MaxRAMPercentage=75 -Djdk.httpclient.keepalive.timeout=30 -Dsun.net.inetaddr.ttl=30"
+    "_JAVA_OPTIONS": "-XX:+ExitOnOutOfMemoryError -XX:MaxRAMPercentage=75 -Djdk.httpclient.keepalive.timeout=30 -Dsun.net.inetaddr.ttl=30 -Dio.yupiik.logging.jul.handler.StandardHandler.formatter=json"
   }
 }

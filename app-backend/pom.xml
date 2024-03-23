@@ -35,6 +35,11 @@
     <description>Backend module example</description>
 
     <properties>
+        <image.base>ossyupiik/java:21.0.2@sha256:49535a2e04825fbb9ac46176c4046d19a75a289d9463e0ccb7d70096ca7ea0b8</image.base>
+        <image.title>fusion-examples</image.title>
+        <image.name>yupiik/fusion/examples/backend:${project.version}</image.name>
+        <image.workdir>/opt/yupiik/fusion-examples/${project.artifactId}</image.workdir>
+
         <main.class>io.yupiik.fusion.framework.api.main.Launcher</main.class>
     </properties>
 
@@ -187,67 +192,40 @@
                     <main>${main.class}</main>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.1</version>
+                <configuration>
+                    <containerizingMode>packaged</containerizingMode>
+                    <from>
+                        <image>${image.base}</image>
+                    </from>
+                    <to>
+                        <image>${image.name}</image>
+                    </to>
+                    <container>
+                        <appRoot>${image.workdir}</appRoot>
+                        <workingDirectory>${image.workdir}</workingDirectory>
+                        <mainClass>io.yupiik.fusion.framework.api.main.Launcher</mainClass>
+                        <jvmFlags>
+                            <jvmFlag>-Djava.util.logging.manager=io.yupiik.logging.jul.YupiikLogManager</jvmFlag>
+                            <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
+                        </jvmFlags>
+                        <labels>
+                            <org.opencontainers.image.created>${maven.build.timestamp}</org.opencontainers.image.created>
+                            <org.opencontainers.image.authors>Yupiik</org.opencontainers.image.authors>
+                            <org.opencontainers.image.vendor>Yupiik</org.opencontainers.image.vendor>
+                            <org.opencontainers.image.title>${image.title}</org.opencontainers.image.title>
+                            <org.opencontainers.image.description>${project.description}</org.opencontainers.image.description>
+                            <org.opencontainers.image.version>${project.version}</org.opencontainers.image.version>
+                            <com.meecrogate.params>_JAVA_OPTIONS=...</com.meecrogate.params>
+                            <com.meecrogate.cmd>docker run ${image.name} &lt;args&gt;</com.meecrogate.cmd>
+                        </labels>
+                    </container>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile><!-- mvn jib:dockerBuild -Pdocker -->
-            <id>docker</id>
-            <properties>
-                <image.base>ossyupiik/java:17.0.7@sha256:1a08a09ea4374243f28a48ec5331061d53abcdac70e51c1812b32ac4055a7deb</image.base>
-                <image.title>fusion-examples-rest-api</image.title>
-                <image.name>fusion-examples-rest-api</image.name>
-                <image.workdir>/fusion-examples-rest-api</image.workdir>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.google.cloud.tools</groupId>
-                        <artifactId>jib-maven-plugin</artifactId>
-                        <version>3.3.2</version>
-                        <configuration>
-                            <containerizingMode>packaged</containerizingMode>
-                            <from>
-                                <image>${image.base}</image>
-                            </from>
-                            <to>
-                                <image>${image.name}</image>
-                            </to>
-                            <container>
-                                <appRoot>${image.workdir}</appRoot>
-                                <workingDirectory>${image.workdir}</workingDirectory>
-                                <extraClasspath>${image.workdir}/tmfc005-${project.version}/lib/*</extraClasspath>
-                                <creationTime>${maven.build.timestamp}</creationTime>
-                                <filesModificationTime>${maven.build.timestamp}</filesModificationTime>
-                                <mainClass>io.yupiik.fusion.framework.api.main.Launcher</mainClass>
-                                <jvmFlags>
-                                    <jvmFlag>-Djava.util.logging.manager=io.yupiik.logging.jul.YupiikLogManager</jvmFlag>
-                                    <jvmFlag>-Dio.yupiik.logging.jul.handler.StandardHandler.formatter=json</jvmFlag>
-                                    <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
-                                    <jvmFlag>-Djdk.serialFilter=!*</jvmFlag>
-                                    <jvmFlag>-Djdk.jndi.object.factoriesFilter=!*</jvmFlag>
-                                    <jvmFlag>-Dcom.sun.jndi.ldap.object.trustSerialData=false</jvmFlag>
-                                    <jvmFlag>-Dtmfc005.build.timestamp=${maven.build.timestamp}</jvmFlag>
-                                </jvmFlags>
-                                <labels>
-                                    <org.opencontainers.image.created>${maven.build.timestamp}</org.opencontainers.image.created>
-                                    <org.opencontainers.image.authors>Yupiik</org.opencontainers.image.authors>
-                                    <org.opencontainers.image.vendor>Yupiik</org.opencontainers.image.vendor>
-                                    <org.opencontainers.image.title>${image.title}</org.opencontainers.image.title>
-                                    <org.opencontainers.image.description>${project.description}</org.opencontainers.image.description>
-                                    <org.opencontainers.image.version>${project.version}</org.opencontainers.image.version>
-                                    <com.meecrogate.params>_JAVA_OPTIONS=...</com.meecrogate.params>
-                                    <com.meecrogate.cmd>docker run ${image.name} &lt;args&gt;</com.meecrogate.cmd>
-                                </labels>
-                            </container>
-                            <outputPaths>
-                                <imageJson>${project.build.directory}/jib-image.json</imageJson>
-                            </outputPaths>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>

@@ -39,7 +39,9 @@
 
         <bundlebee.alveolus.default>all-in-one</bundlebee.alveolus.default>
         <bundlebee.debug>false</bundlebee.debug>
-        <namespace.name>observability</namespace.name>
+
+        <app.namespace.name>fusion</app.namespace.name>
+        <observability.namespace.name>observability</observability.namespace.name>
     </properties>
 
     <dependencies>
@@ -134,12 +136,6 @@
                     </skipPackaging>
                     <customPlaceholders>
                         <app.deploytime>${maven.build.timestamp}</app.deploytime>
-                        <!-- transitive alveoli -->
-                        <grafana-simple.namespace>${namespace.name}</grafana-simple.namespace>
-                        <prometheus-simple.namespace>${namespace.name}</prometheus-simple.namespace>
-                        <monitoring.namespace>${namespace.name}</monitoring.namespace>
-                        <!-- self -->
-                        <namespace.name>${namespace.name}</namespace.name>
                         <!-- extracted palceholders -->
                         <bundlebee-placeholder-import-placeholders>
                             ${project.basedir}/bundlebee/placeholders.properties
@@ -149,5 +145,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

@@ -50,7 +50,7 @@
         }
       ],
       "placeholders": {
-        "namespace.name": "fusion"
+        "namespace.name": "{{app.namespace.name}}"
       }
     },
     {
@@ -62,7 +62,7 @@
         }
       ],
       "placeholders": {
-        "namespace.name": "observability"
+        "namespace.name": "{{observability.namespace.name}}"
       }
     },
     {
@@ -79,10 +79,11 @@
         }
       ],
       "placeholders": {
+        "namespace.name": "{{app.namespace.name}}",
         "service.name": "backend",
         "service.component": "backend",
         "service.version": "{{project.version}}",
-        "service.image.name": "fusion/examples/backend",
+        "service.image.name": "yupiik/fusion/examples/backend",
         "service.image.version": "{{project.version}}"
       }
     },
@@ -111,7 +112,7 @@
         }
       ],
       "placeholders": {
-        "monitoring.namespace": "observability",
+        "monitoring.namespace": "{{observability.namespace.name}}",
         "observability.deploytime": "{{app.deploytime}}"
       }
     },
