@@ -125,6 +125,16 @@
               "value": "{{observability.namespace.name}}"
             }
           ]
+        },
+        {
+          "descriptorName": "io.yupiik.alveoli_prometheus-simple.clusterrolebinding.yaml",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/subjects/0/namespace",
+              "value": "{{observability.namespace.name}}"
+            }
+          ]
         }
       ]
     },

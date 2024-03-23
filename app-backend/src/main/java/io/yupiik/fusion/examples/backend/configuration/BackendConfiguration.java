@@ -21,5 +21,7 @@ import io.yupiik.fusion.framework.build.api.configuration.RootConfiguration;
 @RootConfiguration("backend")
 public record BackendConfiguration(
         @Property(defaultValue = "\"productInventory.json\"", documentation = "Resource to load as default product inventory.")
-        String productInventoryResource) {
+        String productInventoryResource,
+        @Property(defaultValue = "\"-\"", documentation = "Zipkin URL if tracing is enabled.")
+        String zipkin) {
 }

@@ -83,6 +83,11 @@
             <version>${fusion.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.yupiik.fusion</groupId>
+            <artifactId>fusion-tracing</artifactId>
+            <version>${fusion.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.yupiik.logging</groupId>
             <artifactId>yupiik-logging-jul</artifactId>
             <version>${yupiik-logging.version}</version>
