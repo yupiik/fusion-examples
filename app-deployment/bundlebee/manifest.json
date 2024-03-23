@@ -114,7 +114,19 @@
       "placeholders": {
         "monitoring.namespace": "{{observability.namespace.name}}",
         "observability.deploytime": "{{app.deploytime}}"
-      }
+      },
+      "patches": [
+        {
+          "descriptorName": "io.yupiik.alveoli_loki-simple.rolebinding.yaml",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/subjects/0/namespace",
+              "value": "{{observability.namespace.name}}"
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "all-in-one",
