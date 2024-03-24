@@ -13,3 +13,193 @@ Pre-requisite: Maven >= 3.8 and Java >= 17.
 ----
 mvn clean install
 ----
+
+== Test
+
+=== Products
+
+*On local dev*
+
+REST:
+
+[source, bash]
+----
+curl http://localhost:8080/product | jq
+----
+
+JSON-RPC:
+
+[source, bash]
+----
+curl -X POST http://localhost:8080/jsonrpc -d '
+{
+  "jsonrpc": "2.0",
+  "method": "fusion.examples.product.findAll"
+}
+' | jq
+----
+
+*On Minikube*
+
+REST:
+
+[source, bash]
+----
+curl http://192.168.49.2:32340/product | jq
+----
+
+JSON-RPC:
+
+[source, bash]
+----
+curl -X POST http://192.168.49.2:32340/jsonrpc -d '
+{
+  "jsonrpc": "2.0",
+  "method": "fusion.examples.product.findAll"
+}
+' | jq
+----
+
+=== Orders
+
+*On local dev*
+
+REST:
+
+[source, bash]
+----
+curl -X POST http://localhost:8080/order -d '
+{
+    "description": "Mobile Line",
+    "name": "Mobile Line",
+    "products": [
+        {
+            "id": "123456789",
+            "name": "Mobile Line",
+            "description": "Mobile Line with MSISDN"
+        },
+        {
+            "id": "987654321",
+            "name": "Device Phone",
+            "description": "Phone Device X Model Alpha GT"
+        }
+    ]
+}
+' | jq
+----
+
+[source, bash]
+----
+curl http://localhost:8080/order | jq
+----
+
+JSON-RPC:
+
+[source, bash]
+----
+curl -X POST http://localhost:8080/jsonrpc -d '
+{
+  "jsonrpc": "2.0",
+  "method": "fusion.examples.order.create",
+  "params": {
+    "order": {
+            "description": "Mobile Line",
+            "name": "Mobile Line",
+            "products": [
+                {
+                    "id": "123456789",
+                    "name": "Mobile Line",
+                    "description": "Mobile Line with MSISDN"
+                },
+                {
+                    "id": "987654321",
+                    "name": "Device Phone",
+                    "description": "Phone Device X Model Alpha GT"
+                }
+            ]
+        }
+  }
+}
+' | jq
+----
+
+[source, bash]
+----
+curl -X POST http://localhost:8080/jsonrpc -d '
+{
+  "jsonrpc": "2.0",
+  "method": "fusion.examples.order.findAll"
+}
+' | jq
+----
+
+*On Minikube*
+
+REST:
+
+[source, bash]
+----
+curl -X POST http://192.168.49.2:32340/order -d '
+{
+    "description": "Mobile Line",
+    "name": "Mobile Line",
+    "products": [
+        {
+            "id": "123456789",
+            "name": "Mobile Line",
+            "description": "Mobile Line with MSISDN"
+        },
+        {
+            "id": "987654321",
+            "name": "Device Phone",
+            "description": "Phone Device X Model Alpha GT"
+        }
+    ]
+}
+' | jq
+----
+
+[source, bash]
+----
+curl http://192.168.49.2:32340/order | jq
+----
+
+JSON-RPC:
+
+[source, bash]
+----
+curl -X POST http://192.168.49.2:32340/jsonrpc -d '
+{
+  "jsonrpc": "2.0",
+  "method": "fusion.examples.order.create",
+  "params": {
+    "order": {
+            "description": "Mobile Line",
+            "name": "Mobile Line",
+            "products": [
+                {
+                    "id": "123456789",
+                    "name": "Mobile Line",
+                    "description": "Mobile Line with MSISDN"
+                },
+                {
+                    "id": "987654321",
+                    "name": "Device Phone",
+                    "description": "Phone Device X Model Alpha GT"
+                }
+            ]
+        }
+  }
+}
+' | jq
+----
+
+[source, bash]
+----
+curl -X POST http://192.168.49.2:32340/jsonrpc -d '
+{
+  "jsonrpc": "2.0",
+  "method": "fusion.examples.order.findAll"
+}
+' | jq
+----

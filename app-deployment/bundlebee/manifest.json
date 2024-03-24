@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/yupiik/bundlebee/gh-pages/generated/jsonschema/manifest.descriptor.json",
   "requirements": [
     {
-      "minBundlebeeVersion": "1.0.25"
+      "minBundlebeeVersion": "1.0.26"
     }
   ],
   "interpolateAlveoli": true,
