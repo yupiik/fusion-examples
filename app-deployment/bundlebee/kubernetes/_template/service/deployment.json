@@ -9,10 +9,10 @@
       "app.kubernetes.io/instance": "{{service.name}}",
       "app.kubernetes.io/version": "{{service.version}}",
       "app.kubernetes.io/component": "{{service.component}}",
-      "app.kubernetes.io/part-of": "observability",
+      "app.kubernetes.io/part-of": "app",
       "app.kubernetes.io/managed-by": "bundlebee",
       "deploy.by":"{{user.name:-unknown}}",
-      "deploy.at":"{{observability.deploytime:-unset}}"
+      "deploy.at":"{{app.deploytime:-unset}}"
     },
     "annotations": {
       "io.yupiik.bundlebee/putOnUpdate": "true"
@@ -29,14 +29,14 @@
         "labels":{
           "app":"{{service.name}}",
           "deploy.by":"{{user.name:-unknown}}",
-          "deploy.at":"{{observability.deploytime:-unset}}",
-          "observability.environment":"{{observability.environment}}"
+          "deploy.at":"{{app.deploytime:-unset}}",
+          "app.environment":"{{app.environment}}"
         },
         "annotations": {
           "prometheus.io/scrape": "true",
           "prometheus.io/scheme": "http",
-          "prometheus.io/path": "/relay",
-          "prometheus.io/port": "8080"
+          "prometheus.io/path": "/metrics",
+          "prometheus.io/port": "8181"
         }
       },
       "spec":{
@@ -81,23 +81,16 @@
                 "cpu": "{{service.resources.requests.cpu:-200m}}"
               },
               "limits": {
-                "memory": "{{service.resources.requests.memory:-256Mi}}",
-                "cpu": "{{service.resources.requests.cpu:-500m}}"
+                "memory": "{{service.resources.requests.memory:-256Mi}}"
               }
             },
             "readinessProbe": {
               "initialDelaySeconds": 4,
-              "periodSeconds": 4,
+              "periodSeconds": 30,
               "failureThreshold": 10,
               "httpGet": {
                 "path": "{{service.probes.readiness.path:-/health?type=live}}",
-                "port": {{service.probes.readiness.port:-8181}},
-                "httpHeaders": [
-                  {
-                    "name": "Health-Key",
-                    "value": "{{yupiik.probes.health.key:-none}}"
-                  }
-                ]
+                "port": {{service.probes.readiness.port:-8181}}
               }
             },
             "livenessProbe": {
@@ -107,13 +100,7 @@
               "timeoutSeconds": 30,
               "httpGet": {
                 "path": "{{service.probes.liveness.path:-/health?type=live}}",
-                "port": {{service.probes.liveness.port:-8181}},
-                "httpHeaders": [
-                  {
-                    "name": "Health-Key",
-                    "value": "{{yupiik.probes.health.key:-none}}"
-                  }
-                ]
+                "port": {{service.probes.liveness.port:-8181}}
               }
             }
           }

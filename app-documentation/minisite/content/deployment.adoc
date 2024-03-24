@@ -1,0 +1,29 @@
+= Deployment
+:minisite-index: 800
+:minisite-index-title: Deployment
+:minisite-index-description: Deploy.
+:minisite-index-icon: fas fa-space-shuttle
+:minisite-keywords: configuration, json-rpc, documentation
+:minisite-breadcrumb: Home[/hcms/] > Deployment
+:minisite-nav-prev-label: API
+
+[abstract]
+This page lists the placeholders available, i.e. values you can use to tune the deployment.
+
+== Placeholders
+
+include::{partialsdir}/generated/placeholders/doc.adoc[]
+
+== Completion
+
+Often placeholders are configured using properties files (see `bundlebee/placeholders.properties`).
+Using VSCode and https://github.com/rmannibucau/vscode-properties-custom-completion extension for VSCode you can even get completion on available placeholders.
+
+== Sample configuration
+
+Here is a (commented) sample placeholder properties file:
+
+[source,properties]
+----
+include::{partialsdir}/generated/placeholders/sample.properties[]
+----

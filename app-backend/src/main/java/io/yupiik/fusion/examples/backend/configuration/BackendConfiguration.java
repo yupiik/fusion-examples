@@ -13,16 +13,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.yupiik.fusion.examples.backend.model;
+package io.yupiik.fusion.examples.backend.configuration;
 
 import io.yupiik.fusion.framework.build.api.configuration.Property;
-import io.yupiik.fusion.framework.build.api.json.JsonModel;
+import io.yupiik.fusion.framework.build.api.configuration.RootConfiguration;
 
-import java.time.LocalDate;
-
-@JsonModel
-public record Product(
-        @Property(documentation = "Product identifier.") String id,
-        @Property(documentation = "Product name.") String name,
-        @Property(documentation = "Product description.") String description) {
+@RootConfiguration("backend")
+public record BackendConfiguration(
+        @Property(defaultValue = "\"productInventory.json\"", documentation = "Resource to load as default product inventory.")
+        String productInventoryResource,
+        @Property(defaultValue = "\"-\"", documentation = "Zipkin URL if tracing is enabled.")
+        String zipkin) {
 }

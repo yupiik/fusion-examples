@@ -35,10 +35,54 @@
     <description>Deployment example</description>
 
     <properties>
-        <bundlebee.alveolus.default>observability</bundlebee.alveolus.default>
+        <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
+
+        <bundlebee.alveolus.default>all-in-one</bundlebee.alveolus.default>
         <bundlebee.debug>false</bundlebee.debug>
-        <namespace.name>observability</namespace.name>
+
+        <app.namespace.name>fusion</app.namespace.name>
+        <observability.namespace.name>observability</observability.namespace.name>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.yupiik.fusion</groupId>
+            <artifactId>fusion-json</artifactId>
+            <version>${fusion.version}</version>
+        </dependency>
+
+        <!-- just enforces a maven standard resolution for consistency -->
+        <dependency>
+            <groupId>io.yupiik.alveoli</groupId>
+            <artifactId>monitoring-alveolus</artifactId>
+            <version>${yupiik.bundlebee.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.yupiik.alveoli</groupId>
+            <artifactId>grafana-simple</artifactId>
+            <version>${yupiik.bundlebee.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.yupiik.alveoli</groupId>
+            <artifactId>loki-simple</artifactId>
+            <version>${yupiik.bundlebee.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.yupiik.alveoli</groupId>
+            <artifactId>prometheus-simple</artifactId>
+            <version>${yupiik.bundlebee.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.yupiik.alveoli</groupId>
+            <artifactId>zipkin-simple</artifactId>
+            <version>${yupiik.bundlebee.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <resources>
@@ -57,27 +101,30 @@
                 <groupId>io.yupiik</groupId>
                 <artifactId>bundlebee-maven-plugin</artifactId>
                 <version>${yupiik.bundlebee.version}</version>
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>generate-placeholders</id>-->
-<!--                        <phase>prepare-package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>placeholder-extract</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <descriptions>${project.basedir}/bundlebee/descriptions.properties</descriptions>-->
-<!--                            <outputType>FILE</outputType>-->
-<!--                            <dumpLocation>${project.basedir}/minisite/content/_partials/placeholders</dumpLocation>-->
-<!--                            <docFilename>doc.adoc</docFilename>-->
-<!--                            <propertiesFilename>sample.properties</propertiesFilename>-->
-<!--                            <completionFilename>completion.properties</completionFilename>-->
-<!--                            <failOnInvalidDescription>true</failOnInvalidDescription>-->
-<!--                            <ignoredPlaceholders>-->
-<!--                                bundlebee-.*,cronjob.*,service.*,project.*,user.name,observability.namespace.name,prometheus-simple.namespace,grafana-simple.namespace,prometheus-simple.rbac.apiVersion-->
-<!--                            </ignoredPlaceholders>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
+                <executions>
+                    <execution>
+                        <id>generate-placeholders</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>placeholder-extract</goal>
+                        </goals>
+                        <configuration>
+                            <descriptions>${project.basedir}/bundlebee/descriptions.properties</descriptions>
+                            <outputType>FILE</outputType>
+                            <dumpLocation>${project.basedir}/../app-documentation/minisite/content/_partials/generated/placeholders</dumpLocation>
+                            <docFilename>doc.adoc</docFilename>
+                            <propertiesFilename>sample.properties</propertiesFilename>
+                            <completionFilename>completion.properties</completionFilename>
+                            <failOnInvalidDescription>true</failOnInvalidDescription>
+                            <ignoredPlaceholders>
+                                bundlebee-.*,cronjob.*,service.*,project.*,user.name,
+                                observability.namespace.name,prometheus-simple.namespace,grafana-simple.namespace,prometheus-simple.rbac.apiVersion,monitoring.namespace,
+                                observability.deploytime,loki-simple.rbac.apiVersion,prometheus-simple.rbac.apiVersion,
+                                grafana-simple.namespace,loki-simple.namespace,prometheus-simple.namespace,zipkin-simple.namespace,namespace.name
+                            </ignoredPlaceholders>
+                        </configuration>
+                    </execution>
+                </executions>
                 <configuration>
                     <alveolus>${bundlebee.alveolus.default}</alveolus>
                     <manifest>${project.basedir}/bundlebee/manifest.json</manifest>
@@ -88,12 +135,7 @@
                         <skipPackaging>none</skipPackaging>
                     </skipPackaging>
                     <customPlaceholders>
-                        <!-- transitive alveoli -->
-                        <grafana-simple.namespace>${namespace.name}</grafana-simple.namespace>
-                        <prometheus-simple.namespace>${namespace.name}</prometheus-simple.namespace>
-                        <monitoring.namespace>${namespace.name}</monitoring.namespace>
-                        <!-- self -->
-                        <namespace.name>${namespace.name}</namespace.name>
+                        <app.deploytime>${maven.build.timestamp}</app.deploytime>
                         <!-- extracted palceholders -->
                         <bundlebee-placeholder-import-placeholders>
                             ${project.basedir}/bundlebee/placeholders.properties
@@ -103,5 +145,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

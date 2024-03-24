@@ -62,7 +62,15 @@
                     <target>${maven.compiler.release}</target>
                     <parameters>true</parameters>
                     <fork>false</fork>
+                    <compilerArgs>
+                        <compilerArg>-Xlint:deprecation</compilerArg>
+                    </compilerArgs>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
             </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>

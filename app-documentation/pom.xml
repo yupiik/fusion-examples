@@ -34,11 +34,35 @@
     <name>Fusion examples :: Documentation</name>
     <description>Documentation example</description>
 
+    <dependencies>
+        <dependency>
+            <groupId>io.yupiik.fusion</groupId>
+            <artifactId>fusion-documentation</artifactId>
+            <version>${fusion.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- for reactor -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>app-backend</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>app-deployment</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <type>pom</type>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
                 <!--
-                    mvn prepare-package yupiik-tools:minisite
+                    mvn process-classes yupiik-tools:serve-minisite -e
                 -->
                 <groupId>io.yupiik.maven</groupId>
                 <artifactId>yupiik-tools-maven-plugin</artifactId>
@@ -46,14 +70,55 @@
                 <configuration>
                     <source>${project.basedir}/minisite</source>
                     <preferYupiikAsciidoc>true</preferYupiikAsciidoc>
-                    <title>${project.name}</title>
+                    <title>Fusion Backend</title>
                     <description>${project.description}</description>
-                    <logoText>${project.name}</logoText>
-                    <indexText>${project.name}</indexText>
+                    <logoText>Fusion Backend</logoText>
+                    <indexText>Fusion Backend</indexText>
                     <indexSubTitle>${project.description}</indexSubTitle>
                     <attributes>
                         <partialsdir>${project.basedir}/minisite/content/_partials</partialsdir>
                     </attributes>
+                    <preActions>
+                        <preAction>
+                            <type>io.yupiik.fusion.documentation.DocumentationGenerator</type>
+                            <configuration>
+                                <formatter>definitionList</formatter>
+                                <includeEnvironmentNames>true</includeEnvironmentNames>
+                                <module>app-backend</module>
+                                <urls>file://${project.parent.basedir}/app-backend/target/classes/META-INF/fusion/configuration/documentation.json</urls>
+                            </configuration>
+                        </preAction>
+                        <preAction>
+                            <type>io.yupiik.fusion.documentation.OpenRpcGenerator</type>
+                            <configuration>
+                                <title>Backend</title>
+                                <output>${project.basedir}/minisite/content/_partials/generated/openrpc.json</output>
+                            </configuration>
+                        </preAction>
+                        <preAction>
+                            <type>io.yupiik.fusion.documentation.OpenRPC2OpenAPI</type>
+                            <configuration>
+                                <input>${project.parent.basedir}/app-backend/target/classes/META-INF/fusion/jsonrpc/openrpc.json</input>
+                                <output>${project.basedir}/minisite/content/_partials/generated/openapi.json</output>
+                                <info.title>Fusion Backend</info.title>
+                                <info.version>${project.version}</info.version>
+                            </configuration>
+                        </preAction>
+                        <preAction>
+                            <type>copy</type>
+                            <configuration>
+                                <from>${project.basedir}/minisite/content/_partials/generated/openapi.json</from>
+                                <to>${project.build.directory}/${project.build.finalName}/openapi.json</to>
+                            </configuration>
+                        </preAction>
+                        <preAction>
+                            <type>io.yupiik.fusion.documentation.OpenRPC2Adoc</type>
+                            <configuration>
+                                <input>${project.parent.basedir}/app-backend/target/classes/META-INF/fusion/jsonrpc/openrpc.json</input>
+                                <output>${project.basedir}/minisite/content/_partials/generated/openrpc.adoc</output>
+                            </configuration>
+                        </preAction>
+                    </preActions>
                 </configuration>
                 <dependencies>
                     <dependency>

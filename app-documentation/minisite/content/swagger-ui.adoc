@@ -1,0 +1,38 @@
+= API (Swagger UI)
+:minisite-nav-prev-label: API
+
+++++
+<div id="swagger-ui"></div>
+<!-- tip: for demo purposes we just use a cdn but it can also use esbuild or webpack to do a real app! -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.12.0/swagger-ui-bundle.min.js" integrity="sha512-vGAdoz2QRNOgs8OGP8eKFno/I4jCe+rY6sV8lFaks2UQf7AxPr4e1URRxX/bf8fMUFARO9A+vQ2Jb+XpBiGZyQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.12.0/swagger-ui-standalone-preset.min.js" integrity="sha512-0nWGki2/3rEDkKQE0AwEJKIHNjyaHhj5x/afJmx9XmhMm3hwibOcRJI+uRlXNbi4ASmgi5lTYxqNY1ldAD5GHg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+if (!document.querySelector('head > link#swaggerUi')) {
+    const link = document.createElement('link');
+    link.id = 'swaggerUi';
+    link.rel = 'stylesheet';
+    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.12.0/swagger-ui.min.css';
+    link.integrity = 'sha512-pV+ep5Xjvc5jwqjAGERsdA00vVaP7eaKd2dYDSEe3sqe3v4ohjue4O51AnLvQGOU2hrlTo7tvLpHXLZfQa9Ubg==';
+    link.crossOrigin = 'anonymous';
+    link.referrerPolicy = 'no-referrer';
+    document.head.appendChild(link);
+
+    // reset code background too since minisite theme override breaks swagger-ui theme
+    const style = document.createElement('style');
+    style.innerHTML = 'code {background: inherit;}';
+    document.head.appendChild(style);
+}
+SwaggerUIBundle({
+    url: 'openapi.json',
+    dom_id: '#swagger-ui',
+    deepLinking: true,
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIBundle.SwaggerUIStandalonePreset,
+    ],
+    plugins: [
+      SwaggerUIBundle.plugins.DownloadUrl,
+    ],
+});
+</script>
+++++

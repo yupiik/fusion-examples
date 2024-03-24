@@ -48,7 +48,44 @@
         {
           "name": "_namespace"
         }
-      ]
+      ],
+      "placeholders": {
+        "namespace.name": "{{app.namespace.name}}"
+      }
+    },
+    {
+      "name": "observability-namespace",
+      "version": "{{project.version}}",
+      "dependencies": [
+        {
+          "name": "_namespace"
+        }
+      ],
+      "placeholders": {
+        "namespace.name": "{{observability.namespace.name}}"
+      }
+    },
+    {
+      "name": "backend",
+      "version": "{{project.version}}",
+      "descriptors": [
+        {
+          "name": "server/backend/configmap.json"
+        }
+      ],
+      "dependencies": [
+        {
+          "name": "_app"
+        }
+      ],
+      "placeholders": {
+        "namespace.name": "{{app.namespace.name}}",
+        "service.name": "backend",
+        "service.component": "backend",
+        "service.version": "{{project.version}}",
+        "service.image.name": "yupiik/fusion/examples/backend",
+        "service.image.version": "{{project.version}}"
+      }
     },
     {
       "name": "app",
@@ -56,6 +93,59 @@
       "dependencies": [
         {
           "name": "app-namespace"
+        },
+        {
+          "name": "backend"
+        }
+      ]
+    },
+    {
+      "name": "observability",
+      "chainDependencies": true,
+      "dependencies": [
+        {
+          "name": "observability-namespace"
+        },
+        {
+          "name": "io.yupiik.alveoli:monitoring-alveolus:{{yupiik.bundlebee.version}}",
+          "location": "io.yupiik.alveoli:monitoring-alveolus:{{yupiik.bundlebee.version}}"
+        }
+      ],
+      "placeholders": {
+        "monitoring.namespace": "{{observability.namespace.name}}",
+        "observability.deploytime": "{{app.deploytime}}"
+      },
+      "patches": [
+        {
+          "descriptorName": "io.yupiik.alveoli_loki-simple.rolebinding.yaml",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/subjects/0/namespace",
+              "value": "{{observability.namespace.name}}"
+            }
+          ]
+        },
+        {
+          "descriptorName": "io.yupiik.alveoli_prometheus-simple.clusterrolebinding.yaml",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/subjects/0/namespace",
+              "value": "{{observability.namespace.name}}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "all-in-one",
+      "dependencies": [
+        {
+          "name": "observability"
+        },
+        {
+          "name": "app"
         }
       ]
     }

@@ -1,22 +1,14 @@
 = Configuration
+:minisite-index: 300
+:minisite-index-title: Configuration
+:minisite-index-description: Application Configuration.
+:minisite-index-icon: code
+:minisite-keywords: configuration
+:minisite-breadcrumb: Home[/] > Configuration
+:minisite-nav-prev-label: Getting Started
+:minisite-nav-next-label: JSON-RPC
 
 [abstract]
-This page lists the placeholders available, i.e. values you can use to tune the deployment.
+This page lists the configuration of the application.
 
-== Placeholders
-
-include::{partialsdir}/placeholders/doc.adoc[]
-
-== Completion
-
-Often placeholders are configured using properties files (see `bundlebee/placeholders.properties`).
-Using VSCode and https://github.com/rmannibucau/vscode-properties-custom-completion extension for VSCode you can even get completion on available placeholders.
-
-== Sample configuration
-
-Here is a (commented) sample placeholder properties file:
-
-[source,properties]
-----
-include::{partialsdir}/placeholders/sample.properties[]
-----
+include::{partialsdir}/generated/documentation.app-backend.adoc[]

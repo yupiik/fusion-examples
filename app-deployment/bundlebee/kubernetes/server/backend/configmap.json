@@ -1,0 +1,29 @@
+{
+  "apiVersion":"v1",
+  "kind":"ConfigMap",
+  "metadata":{
+    "name":"backend",
+    "namespace": "{{namespace.name}}",
+    "labels":{
+      "app.kubernetes.io/name": "backend",
+      "app.kubernetes.io/instance": "backend",
+      "app.kubernetes.io/version": "{{service.version}}",
+      "app.kubernetes.io/component": "backend",
+      "app.kubernetes.io/part-of": "fusion",
+      "app.kubernetes.io/managed-by": "bundlebee",
+      "deploy.by":"{{user.name:-unknown}}",
+      "deploy.at":"{{app.deploytime:-unset}}"
+    },
+    "annotations": {
+      "io.yupiik.bundlebee/putOnUpdate": "true"
+    }
+  },
+  "data": {
+    "_DEPLOY_TIME":"{{app.deploytime:-unset}}",
+    "_JAVA_OPTIONS": "-XX:+ExitOnOutOfMemoryError -XX:MaxRAMPercentage=75 -Djdk.httpclient.keepalive.timeout=30 -Dsun.net.inetaddr.ttl=30 -Dio.yupiik.logging.jul.handler.StandardHandler.formatter=json",
+
+    "APPLICATION_ENVIRONMENT":"{{app.environment:-development}}",
+
+    "BACKEND_ZIPKIN": "http://zipkin.observability.svc.cluster.local:9411/api/v2/spans"
+  }
+}

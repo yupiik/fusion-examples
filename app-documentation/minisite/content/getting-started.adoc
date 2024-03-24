@@ -3,10 +3,15 @@
 :minisite-index-title: Getting Started
 :minisite-index-description: How to get started with the project.
 :minisite-index-icon: play
+:minisite-keywords: getting-started
+:minisite-breadcrumb: Home[/] > Configuration
+:minisite-nav-next-label: Configuration
 
 [abstract]
 This project aims to test automatically in a Kubernetes cluster and in a monitored fashion some scenarii.
 
 Learn more:
 
-* xref:configuration.adoc[]
+* xref:configuration.adoc[Configuration]
+* xref:api.adoc[API]
+* xref:deployment.adoc[Deployment]

@@ -13,13 +13,8 @@ dist
 .classpath
 .vscode
 
-**/src/generated/**
-**/models/generated/**
-*.mp4
-**/generated-diagram_*
-**/cypress/screenshots/**
+generated
 
-derby.log
 release.properties
 
 **/*.releaseBackup

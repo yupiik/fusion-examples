@@ -1,0 +1,17 @@
+= API
+:minisite-index: 500
+:minisite-index-title: JSON-RPC
+:minisite-index-description: JSON-RPC API.
+:minisite-index-icon: laptop-house
+:minisite-keywords: api, json-rpc, documentation
+:minisite-breadcrumb: Home[/] > JSON-RPC API
+:minisite-nav-prev-label: Configuration
+:minisite-nav-next-label: Deployment
+
+[abstract]
+This page lists the application API.
+
+
+TIP: you can review it using xref:swagger-ui.adoc[Swagger UI] rendering too.
+
+include::{partialsdir}/generated/openrpc.adoc[]

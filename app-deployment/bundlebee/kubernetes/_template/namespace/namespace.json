@@ -5,10 +5,10 @@
     "name":"{{namespace.name}}",
     "labels":{
       "app.kubernetes.io/name": "{{namespace.name}}",
-      "app.kubernetes.io/part-of": "observability",
+      "app.kubernetes.io/part-of": "{{namespace.name}}",
       "app.kubernetes.io/managed-by": "bundlebee",
       "deploy.by":"{{user.name:-unknown}}",
-      "deploy.at":"{{observability.deploytime:-unset}}"
+      "deploy.at":"{{app.deploytime:-unset}}"
     }
   }
 }
