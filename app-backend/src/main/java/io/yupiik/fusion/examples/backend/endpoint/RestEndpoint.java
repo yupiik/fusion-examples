@@ -89,7 +89,7 @@ public class RestEndpoint {
         }
     }
 
-    @HttpMatcher(methods = "PATCH", path = "/order/", pathMatching = HttpMatcher.PathMatching.STARTS_WITH)
+    @HttpMatcher(methods = "PUT", path = "/order/", pathMatching = HttpMatcher.PathMatching.STARTS_WITH)
     public Order updateOrder(final Request request, final Order order) {
         final var id = request.path().split("/")[2];
         return orderService.updateOrder(id, order);

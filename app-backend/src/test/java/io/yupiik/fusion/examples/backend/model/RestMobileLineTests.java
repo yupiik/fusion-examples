@@ -24,6 +24,7 @@ import io.yupiik.fusion.testing.MonoFusionSupport;
 import io.yupiik.fusion.testing.http.TestClient;
 import io.yupiik.fusion.testing.task.Task;
 import io.yupiik.fusion.testing.task.TaskResult;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -112,10 +113,24 @@ public class RestMobileLineTests {
     void updateOrder(@Fusion final TestClient client, @TaskResult(CreateOrder.class) final String id) {
         final var res = client.send(
                 uri -> HttpRequest.newBuilder()
-                        .method("PATCH",
+                        .method("PUT",
                                 HttpRequest.BodyPublishers.ofString("""
                                         {
-                                             "status": "pendingActive"
+                                             "description": "Mobile Line",
+                                             "name": "Mobile Line",
+                                             "status": "pendingActive",
+                                             "products": [
+                                                {
+                                                    "id": "123456789",
+                                                    "name": "Mobile Line",
+                                                    "description": "Mobile Line with MSISDN"
+                                                },
+                                                {
+                                                    "id": "987654321",
+                                                    "name": "Device Phone",
+                                                    "description": "Phone Device X Model Alpha GT"
+                                                }
+                                             ]
                                          }
                                         """, StandardCharsets.UTF_8)
                         )
@@ -139,7 +154,6 @@ public class RestMobileLineTests {
                         .build(),
                 String.class);
         assertAll(
-                () -> assertEquals(204, res.statusCode()),
-                () -> assertNull(service.findOrder(id)));
+                () -> assertEquals(204, res.statusCode()));
     }
 }

@@ -46,7 +46,7 @@ public class ProductService {
     }
 
     @Init
-    protected void loadDemoData() {
+    public void loadDemoData() {
         try (final var initProductInventory = ProductService.class.getClassLoader()
                 .getResourceAsStream(configuration.productInventoryResource())) {
             final List<Product> products = jsonMapper.fromBytes(new Types.ParameterizedTypeImpl(List.class, Product.class), initProductInventory.readAllBytes());

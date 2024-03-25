@@ -18,13 +18,14 @@ package io.yupiik.fusion.examples.backend.model.test;
 import io.yupiik.fusion.examples.backend.model.Order;
 import io.yupiik.fusion.examples.backend.service.OrderService;
 import io.yupiik.fusion.examples.backend.service.ProductService;
+import io.yupiik.fusion.framework.api.scope.ApplicationScoped;
 import io.yupiik.fusion.framework.api.scope.DefaultScoped;
 import io.yupiik.fusion.testing.task.Task;
 
 import static io.yupiik.fusion.examples.backend.model.OrderStatus.created;
 import static java.time.LocalDate.EPOCH;
 
-@DefaultScoped
+@ApplicationScoped
 public class CreateOrder implements Task.Supplier<String> {
     private final ProductService products;
     private final OrderService service;
@@ -39,8 +40,8 @@ public class CreateOrder implements Task.Supplier<String> {
         final var date = EPOCH.atStartOfDay();
         final var order = service.createOrder(new Order(
                 null /* generated */,
-                "description", "Mobile Line",
-                date, date, products.findProducts(), created));
+                "Mobile Line", "Mobile Line",
+                date, date, products.findProducts(), null /* set by service */));
         return order.id();
     }
 }

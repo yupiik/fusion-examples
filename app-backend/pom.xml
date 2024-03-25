@@ -79,6 +79,16 @@
         </dependency>
         <dependency>
             <groupId>io.yupiik.fusion</groupId>
+            <artifactId>fusion-persistence</artifactId>
+            <version>${fusion.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jdbc</artifactId>
+            <version>${tomcat.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.yupiik.fusion</groupId>
             <artifactId>fusion-observability</artifactId>
             <version>${fusion.version}</version>
         </dependency>
@@ -110,6 +120,12 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -181,6 +197,10 @@
                         <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
                         <fusion.http-server.port>0</fusion.http-server.port>
                         <fusion.observability.server.port>0</fusion.observability.server.port>
+                        <fusion.persistence.contextLess>true</fusion.persistence.contextLess>
+                        <fusion.persistence.datasource.url>jdbc:h2:mem:fusion;mode=PostgreSQL;INIT=runscript from '../src/database/fusion-dump.sql'</fusion.persistence.datasource.url>
+                        <fusion.persistence.datasource.username>sa</fusion.persistence.datasource.username>
+                        <fusion.persistence.datasource.driver>org.h2.Driver</fusion.persistence.datasource.driver>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

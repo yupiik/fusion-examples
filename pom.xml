@@ -38,7 +38,9 @@
         <fusion.version>1.0.17-SNAPSHOT</fusion.version>
 
         <yupiik-logging.version>1.0.7</yupiik-logging.version>
+        <tomcat.version>10.1.18</tomcat.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
+        <h2.version>2.2.224</h2.version>
 
         <yupiik.tools.version>1.2.1</yupiik.tools.version>
         <yupiik.bundlebee.version>1.0.26</yupiik.bundlebee.version>

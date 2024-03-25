@@ -113,7 +113,7 @@ public class JsonRpcMobileLineTests {
     private void assertInsertedOrder(final Order order, @TaskResult(CreateOrder.class) final String id, final Supplier<String> debug) {
         assertAll(
                 () -> assertEquals(id, order.id(), debug),
-                () -> assertEquals("description", order.name(), debug),
+                () -> assertEquals("Mobile Line", order.name(), debug),
                 () -> assertEquals("Mobile Line", order.description(), debug),
                 () -> assertEquals(2, order.products().size(), debug));
     }
