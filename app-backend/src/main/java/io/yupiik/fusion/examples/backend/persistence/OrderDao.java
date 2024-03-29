@@ -15,8 +15,6 @@
  */
 package io.yupiik.fusion.examples.backend.persistence;
 
-import io.yupiik.fusion.examples.backend.model.Order;
-import io.yupiik.fusion.examples.backend.model.Product;
 import io.yupiik.fusion.framework.api.scope.ApplicationScoped;
 import io.yupiik.fusion.persistence.api.ContextLessDatabase;
 import io.yupiik.fusion.persistence.api.TransactionManager;
@@ -47,8 +45,7 @@ public class OrderDao {
             this(
                     database.entity(OrderProductEntity.class).getFindAllQuery()
                             + " WHERE order_id = ?",
-                    database.entity(OrderProductEntity.class).getDeleteQuery()
-                            + " order_id = ?"
+                    "delete from " + database.entity(OrderProductEntity.class).getTable() + " where order_id = ?"
             );
         }
     }
@@ -66,10 +63,12 @@ public class OrderDao {
         try {
             return txMgr.write(connection -> {
                 final var createdOrder = database.insert(connection, orderEntity);
-                products.forEach(product -> database.insert(connection, new OrderProductEntity(createdOrder.id(), product)));
+                database.batchInsert(connection, OrderProductEntity.class, products.stream()
+                        .map(it -> new OrderProductEntity(createdOrder.id(), it))
+                        .iterator());
                 return createdOrder;
             });
-        } catch (Error error) {
+        } catch (Exception exception) {
             // error, rollback is managed by datasource, no need to manage it by hand
             logger.severe("Error on insert order");
             throw new IllegalStateException("Error on order creation");
@@ -79,7 +78,7 @@ public class OrderDao {
     public OrderEntity updateOrder(final OrderEntity entity) {
         try {
             return txMgr.write(connection -> database.update(connection, entity));
-        } catch (Error error) {
+        } catch (Exception exception) {
             // error, rollback is managed by datasource, no need to manage it by hand
             logger.severe("Error on update for entity :: " + entity.id());
             throw new IllegalStateException("Error on order update");
@@ -91,7 +90,7 @@ public class OrderDao {
             txMgr.write(connection -> database.execute(
                     connection, this.queries.deleteAllProductForOrderQuery(), b -> b.bind(entity.id())));
             txMgr.write(connection -> database.delete(connection, entity));
-        } catch (Error error) {
+        } catch (Exception exception) {
             // error, rollback is managed by datasource, no need to manage it by hand
             logger.severe("Error on delete for entity :: " + entity.id());
         }

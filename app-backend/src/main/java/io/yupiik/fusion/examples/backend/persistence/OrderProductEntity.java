@@ -17,6 +17,7 @@ package io.yupiik.fusion.examples.backend.persistence;
 
 import io.yupiik.fusion.examples.backend.model.OrderStatus;
 import io.yupiik.fusion.framework.build.api.persistence.Column;
+import io.yupiik.fusion.framework.build.api.persistence.Id;
 import io.yupiik.fusion.framework.build.api.persistence.OnDelete;
 import io.yupiik.fusion.framework.build.api.persistence.OnInsert;
 import io.yupiik.fusion.framework.build.api.persistence.OnLoad;
@@ -27,27 +28,8 @@ import java.time.LocalDateTime;
 
 @Table("FUSION_ORDER_PRODUCT")
 public record OrderProductEntity(
+        @Id(order = 0)
         @Column(name = "ORDER_ID")  String orderId,
+        @Id(order = 1)
         @Column(name = "PRODUCT_ID")  String productId)
-
-{
-    @OnInsert
-    public OrderProductEntity onInsert() {
-        return this;
-    }
-
-    @OnLoad
-    public OrderProductEntity onLoad() {
-        return this;
-    }
-
-    @OnUpdate
-    public OrderProductEntity onUpdate() {
-        return this;
-    }
-
-    @OnDelete
-    public void onDelete() {
-        // no-op
-    }
-}
+{}

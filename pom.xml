@@ -35,10 +35,10 @@
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <fusion.version>1.0.17-SNAPSHOT</fusion.version>
+        <fusion.version>1.0.18-SNAPSHOT</fusion.version>
 
         <yupiik-logging.version>1.0.7</yupiik-logging.version>
-        <tomcat.version>10.1.18</tomcat.version>
+        <tomcat.version>10.1.20</tomcat.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
         <h2.version>2.2.224</h2.version>
 

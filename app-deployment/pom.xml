@@ -122,6 +122,7 @@
                                 observability.deploytime,loki-simple.rbac.apiVersion,prometheus-simple.rbac.apiVersion,
                                 grafana-simple.namespace,loki-simple.namespace,prometheus-simple.namespace,zipkin-simple.namespace,namespace.name
                             </ignoredPlaceholders>
+                            <kubeconfig>explicit</kubeconfig>
                         </configuration>
                     </execution>
                 </executions>
