@@ -18,8 +18,6 @@ package io.yupiik.fusion.examples.backend.model;
 import io.yupiik.fusion.framework.build.api.configuration.Property;
 import io.yupiik.fusion.framework.build.api.json.JsonModel;
 
-import java.time.LocalDate;
-
 @JsonModel
 public record Product(
         @Property(documentation = "Product identifier.") String id,

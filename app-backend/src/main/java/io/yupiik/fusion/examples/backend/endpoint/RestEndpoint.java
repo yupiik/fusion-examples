@@ -78,7 +78,7 @@ public class RestEndpoint {
             return Response.of()
                     .status(204)
                     .header("content-type", "application/json")
-                    .body(jsonMapper.toString(orderService.deleteOrder(id)))
+                    .body("{ \"id\": \"" + id + "\"}")
                     .build();
         } catch (Exception ex) {
             return Response.of()

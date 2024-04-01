@@ -67,8 +67,9 @@ public class JsonRpcEndpoint {
     }
 
     @JsonRpc(value = "fusion.examples.order.delete", documentation = "Delete an order by id")
-    public CompletionStage<Order> deleteOrder(final Request request, final String id) {
-        return CompletableFuture.completedStage(orderService.deleteOrder(id));
+    public String deleteOrder(final Request request, final String id) {
+        orderService.deleteOrder(id);
+        return id;
     }
 
     @JsonRpc(value = "fusion.examples.order.update", documentation = "Update an existing order")

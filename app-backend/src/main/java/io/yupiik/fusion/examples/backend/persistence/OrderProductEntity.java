@@ -15,16 +15,9 @@
  */
 package io.yupiik.fusion.examples.backend.persistence;
 
-import io.yupiik.fusion.examples.backend.model.OrderStatus;
 import io.yupiik.fusion.framework.build.api.persistence.Column;
 import io.yupiik.fusion.framework.build.api.persistence.Id;
-import io.yupiik.fusion.framework.build.api.persistence.OnDelete;
-import io.yupiik.fusion.framework.build.api.persistence.OnInsert;
-import io.yupiik.fusion.framework.build.api.persistence.OnLoad;
-import io.yupiik.fusion.framework.build.api.persistence.OnUpdate;
 import io.yupiik.fusion.framework.build.api.persistence.Table;
-
-import java.time.LocalDateTime;
 
 @Table("FUSION_ORDER_PRODUCT")
 public record OrderProductEntity(

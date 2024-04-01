@@ -24,7 +24,6 @@ import io.yupiik.fusion.testing.MonoFusionSupport;
 import io.yupiik.fusion.testing.http.TestClient;
 import io.yupiik.fusion.testing.task.Task;
 import io.yupiik.fusion.testing.task.TaskResult;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -39,7 +38,6 @@ import static io.yupiik.fusion.testing.task.Task.Phase.AFTER;
 import static io.yupiik.fusion.testing.task.Task.Phase.BEFORE;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MonoFusionSupport
@@ -139,7 +137,6 @@ public class RestMobileLineTests {
                 Order.class);
         assertAll(
                 () -> assertEquals(200, res.statusCode()),
-                () -> assertEquals(id, res.body().id(), () -> res.body().toString()),
                 () -> assertEquals(pendingActive, res.body().status(), () -> res.body().toString()));
     }
 

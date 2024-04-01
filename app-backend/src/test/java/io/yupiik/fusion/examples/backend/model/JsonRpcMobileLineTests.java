@@ -104,9 +104,9 @@ public class JsonRpcMobileLineTests {
                 "fusion.examples.order.delete",
                 Map.of("id", id));
 
-        final var order = res.asJsonRpc().success().as(Order.class);
+        final var deletedId = res.asJsonRpc().success().as(String.class);
         assertAll(
-                () -> assertInsertedOrder(order, id, res::body),
+                () -> assertEquals(id, deletedId),
                 () -> assertTrue(service.findOrders().isEmpty(), () -> service.findOrders().toString()));
     }
 
