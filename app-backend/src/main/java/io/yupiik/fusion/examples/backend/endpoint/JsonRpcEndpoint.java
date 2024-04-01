@@ -73,7 +73,7 @@ public class JsonRpcEndpoint {
     }
 
     @JsonRpc(value = "fusion.examples.order.update", documentation = "Update an existing order")
-    public CompletionStage<Order> updateOrder(final Request request, final Order order) {
-        return CompletableFuture.completedStage(orderService.updateOrder(order.id(), order));
+    public Order updateOrder(final Request request, final Order order) {
+        return orderService.updateOrder(order);
     }
 }

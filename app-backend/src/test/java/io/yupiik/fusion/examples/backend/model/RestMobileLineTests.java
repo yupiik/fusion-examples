@@ -114,6 +114,7 @@ public class RestMobileLineTests {
                         .method("PUT",
                                 HttpRequest.BodyPublishers.ofString("""
                                         {
+                                             "id": "$id",
                                              "description": "Mobile Line",
                                              "name": "Mobile Line",
                                              "status": "pendingActive",
@@ -130,7 +131,7 @@ public class RestMobileLineTests {
                                                 }
                                              ]
                                          }
-                                        """, StandardCharsets.UTF_8)
+                                        """.replace("$id", id), StandardCharsets.UTF_8)
                         )
                         .uri(uri.resolve("/order/" + id))
                         .build(),

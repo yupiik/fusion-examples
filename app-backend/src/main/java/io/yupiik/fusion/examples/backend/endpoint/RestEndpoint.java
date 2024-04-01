@@ -21,11 +21,16 @@ import io.yupiik.fusion.examples.backend.service.OrderService;
 import io.yupiik.fusion.examples.backend.service.ProductService;
 import io.yupiik.fusion.framework.api.scope.ApplicationScoped;
 import io.yupiik.fusion.framework.build.api.http.HttpMatcher;
+import io.yupiik.fusion.http.server.api.HttpException;
 import io.yupiik.fusion.http.server.api.Request;
 import io.yupiik.fusion.http.server.api.Response;
 import io.yupiik.fusion.json.JsonMapper;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CompletionStage;
+
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 @ApplicationScoped
 public class RestEndpoint {
@@ -52,12 +57,12 @@ public class RestEndpoint {
     }
 
     @HttpMatcher(methods = "POST", path = "/order", pathMatching = HttpMatcher.PathMatching.EXACT)
-    public Response createOrder(final Request request, final Order order) {
-        return Response.of()
-            .status(201)
-            .header("content-type", "application/json")
-            .body(jsonMapper.toString(orderService.createOrder(order)))
-            .build();
+    public CompletionStage<Response> createOrder(final Request request, final Order order) {
+        return completedFuture(Response.of()
+                .status(201)
+                .header("content-type", "application/json")
+                .body(jsonMapper.toString(orderService.createOrder(order)))
+                .build());
     }
 
     @HttpMatcher(methods = "GET", path = "/order", pathMatching = HttpMatcher.PathMatching.EXACT)
@@ -92,6 +97,15 @@ public class RestEndpoint {
     @HttpMatcher(methods = "PUT", path = "/order/", pathMatching = HttpMatcher.PathMatching.STARTS_WITH)
     public Order updateOrder(final Request request, final Order order) {
         final var id = request.path().split("/")[2];
-        return orderService.updateOrder(id, order);
+        if (!Objects.equals(id, order.id())) {
+            final var error = "Id does not match: '" + id + "' vs '" + order.id() + "'";
+            throw new HttpException(
+                    error,
+                    Response.of()
+                            .status(400)
+                            .body(jsonMapper.toString(new Error(error)))
+                            .build());
+        }
+        return orderService.updateOrder(order);
     }
 }

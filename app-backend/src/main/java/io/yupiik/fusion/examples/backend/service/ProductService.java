@@ -22,7 +22,6 @@ import io.yupiik.fusion.framework.api.scope.ApplicationScoped;
 import io.yupiik.fusion.framework.build.api.lifecycle.Init;
 import io.yupiik.fusion.json.JsonMapper;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +39,8 @@ public class ProductService {
 
     private final JsonMapper jsonMapper;
 
+    private List<Product> products;
+
     public ProductService(final BackendConfiguration configuration, final JsonMapper jsonMapper) {
         this.configuration = configuration;
         this.jsonMapper = jsonMapper;
@@ -54,6 +55,7 @@ public class ProductService {
         } catch (final Exception exception) {
             logger.severe("Unable to load product inventory init list from resource file");
         }
+        products = productInventory.values().stream().toList();
     }
 
     public Product findProduct(final String id) {
@@ -61,6 +63,6 @@ public class ProductService {
     }
 
     public List<Product> findProducts() {
-        return new ArrayList<>(productInventory.values());
+        return products;
     }
 }

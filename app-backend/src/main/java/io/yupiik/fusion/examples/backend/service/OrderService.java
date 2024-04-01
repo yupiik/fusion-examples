@@ -23,12 +23,15 @@ import io.yupiik.fusion.framework.api.scope.ApplicationScoped;
 import io.yupiik.fusion.persistence.api.ContextLessDatabase;
 import io.yupiik.fusion.persistence.api.TransactionManager;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
 
 @ApplicationScoped
 public class OrderService {
@@ -42,119 +45,92 @@ public class OrderService {
         this.database = database;
         this.txMgr = txMgr;
         this.productService = productService;
-        // compute queries
+
+        // precompute runtime queries,
+        // ofNullable() cause @ApplicationScoped will create a subclass with null for all params if no no-arg constructor is defined
         this.queries = ofNullable(database).map(Queries::new).orElse(null);
     }
 
-    private record Queries(String findAllProductForOrderQuery, String deleteAllProductForOrderQuery) {
-        private Queries(final ContextLessDatabase database) {
-            this(
-                    database.entity(OrderProductEntity.class).getFindAllQuery()
-                            + " WHERE order_id = ?",
-                    "delete from " + database.entity(OrderProductEntity.class).getTable() + " where order_id = ?"
-            );
-        }
-    }
-
     public Order findOrder(final String id) {
-        return txMgr.read(connection -> {
+        final var db = txMgr.read(connection -> {
             final var orderEntity = database.findById(connection, OrderEntity.class, id);
             if (isNull(orderEntity)) {
-                logger.severe("Order not found");
+                logger.severe(() -> "Order '" + id + "' not found");
                 throw new IllegalArgumentException("Not found");
             }
-            final var productOrderEntities = database.query(connection, OrderProductEntity.class, this.queries.findAllProductForOrderQuery(), b -> b.bind(id));
-            final var order = mapToOrder(orderEntity);
-            order.products().addAll(productOrderEntities.stream().map(OrderProductEntity::productId).map(productService::findProduct).toList());
-            return order;
+            return new Pair<>(
+                    orderEntity,
+                    database.query(
+                            connection, this.queries.findAllProductForOrder(),
+                            b -> b.bind(id), r -> r.mapAll(s -> s.getString(1))));
         });
+        return mapToOrder(db.first(), findProducts(db.second()));
     }
 
     public List<Order> findOrders() {
-//        final var orderEntities = orderDao.findAllOrder();
-//
-        return txMgr.read(connection -> {
+        final var db = txMgr.read(connection -> {
             final var orders = database.findAll(connection, OrderEntity.class);
-            return orders.stream()
-                            .map(this::mapToOrder)
-                            .peek(order -> order.products().addAll(
-                                    database.query(connection, OrderProductEntity.class, this.queries.findAllProductForOrderQuery(), b -> b.bind(order.id()))
-                                        .stream()
-                                            .map(OrderProductEntity::productId)
-                                            .map(productService::findProduct)
-                                            .toList()))
-                            .toList();
+            final var orderIds = orders.stream().map(OrderEntity::id).toList();
+            final var products = orderIds.isEmpty() ?
+                    List.<OrderProductEntity>of() :
+                    database.query(
+                            connection,
+                            OrderProductEntity.class,
+                            queries.findAllProductForOrdersBase() + orderIds.stream()
+                                    .map(i -> "?")
+                                    .collect(joining(", ", "(", ")")),
+                            b -> orderIds.forEach(b::bind));
+            return new Pair<>(orders, products);
         });
 
-//        return txMgr.read(connection -> {
-//            final var orders = database.findAll(connection, OrderEntity.class);
-//            final var orderIds = orders.stream().map(OrderEntity::id).distinct().toList();
-//            final var productOrderIdProductId = orderDao.findProductsByOrderIds(conn, orderIds).stream()
-//                    .collect(groupingBy(OrderProductEntity::orderId));
-//            return orders.stream()
-//                    .map(it -> mapToOrder(it, ofNullable(productOrderIdProductId.get(it.id())).orElse(List.of())))
-//                    .toList();
-//        });
+        final var productsPerOrder = db.second().stream()
+                .collect(groupingBy(OrderProductEntity::orderId, mapping(OrderProductEntity::productId, toList())));
+        return db.first().stream()
+                .map(it -> mapToOrder(it, findProducts(productsPerOrder.getOrDefault(it.id(), List.of()))))
+                .toList();
     }
 
     public Order createOrder(final Order order) {
         logger.fine("Create new order");
-        try {
-            final var createdOrder =  txMgr.write(connection -> {
-                final var temp = database.insert(connection, mapToOrderEntity(order));
-                database.batchInsert(connection, OrderProductEntity.class, order.products().stream().map(Product::id).toList().stream()
-                        .map(it -> new OrderProductEntity(temp.id(), it))
-                        .iterator());
-                return temp;
-            });
-            final var newOrder = mapToOrder(createdOrder);
-            newOrder.products().addAll(order.products());
-            return newOrder;
+        final var createdOrder = txMgr.write(connection -> {
+            final var temp = database.insert(connection, mapToOrderEntity(order));
+            database.batchInsert(connection, OrderProductEntity.class, order.products().stream().map(Product::id).toList().stream()
+                    .map(it -> new OrderProductEntity(temp.id(), it))
+                    .iterator());
+            return temp;
+        });
 
-        } catch (Exception exception) {
-            // error, rollback is managed by datasource, no need to manage it by hand
-            logger.severe("Error on insert order");
-            throw new IllegalStateException("Error on order creation");
-        }
-
+        return mapToOrder(createdOrder, order.products());
     }
 
-    public Order updateOrder(final String orderId, Order order) {
+    public Order updateOrder(final Order order) {
         logger.fine("Update existing order");
-        return txMgr.write(connection -> {
-            final var existingOrderEntity = database.findById(connection, OrderEntity.class, orderId);
-            if (isNull(existingOrderEntity)) {
-                logger.severe("Error on update order");
-                throw new IllegalArgumentException("Not found");
-            }
-            database.update(connection,mapToOrderEntity(order, orderId));
-            return order;
-        });
+        txMgr.write(connection -> database.update(connection, mapToOrderEntity(order))); // fails if not found
+        return order;
     }
 
     public void deleteOrder(final String orderId) {
         logger.fine("Delete existing order");
         txMgr.write(connection -> {
-            final var existingOrderEntity = database.findById(connection, OrderEntity.class, orderId);
-            if (isNull(existingOrderEntity)) {
-                logger.severe("Error on delete order");
-                throw new IllegalArgumentException("Not found");
-            }
-            database.execute(connection, this.queries.deleteAllProductForOrderQuery(), b -> b.bind(orderId));
-            database.delete(connection, existingOrderEntity);
-            return existingOrderEntity;
+            database.execute(connection, this.queries.deleteAllProductForOrder(), b -> b.bind(orderId));
+            database.execute(connection, this.queries.deleteOrderEntityById(), b -> b.bind(orderId));
+            return null;
         });
     }
 
-    private Order mapToOrder(final OrderEntity orderEntity) {
+    private Order mapToOrder(final OrderEntity orderEntity, final List<Product> products) {
         return new Order(
                 orderEntity.id(),
                 orderEntity.description(),
                 orderEntity.name(),
                 orderEntity.creationDate(),
                 orderEntity.lastUpdateDate(),
-                new ArrayList<>(),
+                products,
                 orderEntity.status());
+    }
+
+    private List<Product> findProducts(final List<String> products) {
+        return products.stream().map(productService::findProduct).toList();
     }
 
     private OrderEntity mapToOrderEntity(final Order order) {
@@ -168,14 +144,22 @@ public class OrderService {
         );
     }
 
-    private OrderEntity mapToOrderEntity(final Order order, final String id) {
-        return new OrderEntity(
-                id,
-                order.description(),
-                order.name(),
-                order.creationDate(),
-                order.lastUpdateDate(),
-                order.status()
-        );
+    private record Pair<A, B>(A first, B second) {
+    }
+
+    private record Queries(String findAllProductForOrder,
+                           String findAllProductForOrdersBase,
+                           String deleteOrderEntityById,
+                           String deleteAllProductForOrder) {
+        private Queries(final ContextLessDatabase database) {
+            this(
+                    "SELECT product_id as productId " +
+                            "FROM " + database.entity(OrderProductEntity.class).getTable() + ' '
+                            + "WHERE order_id = ?",
+                    database.entity(OrderProductEntity.class).getFindAllQuery() + " WHERE order_id in ",
+                    "DELETE FROM " + database.entity(OrderEntity.class).getTable() + " WHERE id = ?",
+                    "DELETE FROM " + database.entity(OrderProductEntity.class).getTable() + " WHERE order_id = ?"
+            );
+        }
     }
 }
