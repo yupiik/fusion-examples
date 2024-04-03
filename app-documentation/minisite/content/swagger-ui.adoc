@@ -37,6 +37,15 @@ SwaggerUIBundle({
     plugins: [
       SwaggerUIBundle.plugins.DownloadUrl,
     ],
+    requestInterceptor: function (request) {
+     if (request.loadSpec) {
+       return request;
+     }
+
+     var sep = request.url.lastIndexOf('/');
+     var method = request.url.substring(sep + 1);
+     return Object.assign(request, { url: request.url.substring(0, sep) });
+   },
 });
 </script>
 ++++
