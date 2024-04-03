@@ -23,6 +23,9 @@
     "_JAVA_OPTIONS": "-XX:+ExitOnOutOfMemoryError -XX:MaxRAMPercentage=75 -Djdk.httpclient.keepalive.timeout=30 -Dsun.net.inetaddr.ttl=30 -Dio.yupiik.logging.jul.handler.StandardHandler.formatter=json",
 
     "APPLICATION_ENVIRONMENT":"{{app.environment:-development}}",
+    "FUSION_PERSISTENCE_DATASOURCE_URL": "jdbc:h2:mem:fusion;mode=PostgreSQL;INIT=runscript from '/opt/yupiik/fusion/database/fusion-dump.sql'",
+    "FUSION_PERSISTENCE_DATASOURCE_USERNAME": "sa",
+    "FUSION_PERSISTENCE_DATASOURCE_DRIVER": "org.h2.Driver",
 
     "BACKEND_ZIPKIN": "http://zipkin.observability.svc.cluster.local:9411/api/v2/spans"
   }
