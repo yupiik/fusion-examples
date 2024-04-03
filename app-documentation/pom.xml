@@ -100,8 +100,12 @@
                             <configuration>
                                 <input>${project.parent.basedir}/app-backend/target/classes/META-INF/fusion/jsonrpc/openrpc.json</input>
                                 <output>${project.basedir}/minisite/content/_partials/generated/openapi.json</output>
-                                <info.title>Fusion Backend</info.title>
+                                <info.title>Fusion App Backend</info.title>
                                 <info.version>${project.version}</info.version>
+                                <servers.localhost.url>http://localhost:8080/jsonrpc</servers.localhost.url>
+                                <servers.localhost.description>Local</servers.localhost.description>
+                                <servers.minikube.url>http://192.168.49.2:32340/jsonrpc</servers.minikube.url>
+                                <servers.minikube.description>Minikube</servers.minikube.description>
                             </configuration>
                         </preAction>
                         <preAction>
