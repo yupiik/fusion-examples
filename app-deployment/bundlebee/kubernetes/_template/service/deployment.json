@@ -86,7 +86,7 @@
             },
             "readinessProbe": {
               "initialDelaySeconds": 4,
-              "periodSeconds": 30,
+              "periodSeconds": 10,
               "failureThreshold": 10,
               "httpGet": {
                 "path": "{{service.probes.readiness.path:-/health?type=live}}",
@@ -94,8 +94,8 @@
               }
             },
             "livenessProbe": {
-              "initialDelaySeconds": 10,
-              "periodSeconds": 30,
+              "initialDelaySeconds": 5,
+              "periodSeconds": 10,
               "failureThreshold": 10,
               "timeoutSeconds": 30,
               "httpGet": {
@@ -105,12 +105,7 @@
             }
           }
         ],
-        "serviceAccountName": "{{service.account.name:-default}}",
-        "imagePullSecrets": [
-          {
-            "name": "{{service.image.pullSecret:-registry-secret}}"
-          }
-        ]
+        "serviceAccountName": "{{service.account.name:-default}}"
       }
     },
     "replicas": {{service.replicas:-1}}

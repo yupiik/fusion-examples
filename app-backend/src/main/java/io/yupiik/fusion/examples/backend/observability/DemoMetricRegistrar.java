@@ -18,6 +18,7 @@ package io.yupiik.fusion.examples.backend.observability;
 import io.yupiik.fusion.examples.backend.configuration.BackendConfiguration;
 import io.yupiik.fusion.framework.api.scope.DefaultScoped;
 import io.yupiik.fusion.framework.build.api.event.OnEvent;
+import io.yupiik.fusion.framework.build.api.order.Order;
 import io.yupiik.fusion.http.server.api.WebServer;
 import io.yupiik.fusion.http.server.impl.tomcat.TomcatWebServerConfiguration;
 import io.yupiik.fusion.json.JsonMapper;
@@ -35,6 +36,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static io.yupiik.fusion.tracing.id.IdGenerator.Type.HEX;
 import static jakarta.servlet.DispatcherType.REQUEST;
@@ -46,7 +49,7 @@ import static java.time.Clock.systemUTC;
  */
 @DefaultScoped
 public class DemoMetricRegistrar {
-    protected void onStart(@OnEvent final WebServer.Configuration configuration,
+    protected void onStart(@OnEvent @Order(10_000) final WebServer.Configuration configuration,
                            final MetricsRegistry registry,
                            final BackendConfiguration conf,
                            final JsonMapper json) {
@@ -55,8 +58,10 @@ public class DemoMetricRegistrar {
         // add a custom metric
         tomcatConf.setContextCustomizers(List.of(ctx -> customize(ctx, registry)));
         // enable tracing (zipkin/jaeger)
-        tomcatConf.setTomcatCustomizers(List.of(
-                t -> enableTracing(t, conf, json)));
+        tomcatConf.setTomcatCustomizers(Stream.concat(
+                        tomcatConf.getTomcatCustomizers().stream(), // keep default customizers
+                        Stream.of(t -> enableTracing(t, conf, json)))
+                .toList());
     }
 
     private void enableTracing(final Tomcat tomcat, final BackendConfiguration conf, final JsonMapper json) {
