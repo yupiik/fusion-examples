@@ -19,7 +19,11 @@ if (!document.querySelector('head > link#swaggerUi')) {
 
     // reset code background too since minisite theme override breaks swagger-ui theme
     const style = document.createElement('style');
-    style.innerHTML = 'code {background: inherit;}';
+    style.innerHTML = `
+code { background: inherit; }
+h2.title { visibility: hidden; font-size: 0 !important; height: min-content; }
+h2.title > span { visibility: visible; display: flex; }
+`;
     document.head.appendChild(style);
 }
 SwaggerUIBundle({

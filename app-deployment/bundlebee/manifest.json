@@ -84,7 +84,8 @@
         "service.component": "backend",
         "service.version": "{{project.version}}",
         "service.image.name": "yupiik/fusion/examples/backend",
-        "service.image.version": "{{project.version}}"
+        "service.image.version": "{{project.version}}",
+        "service.node.port": "{{app.node.port:-32340}}"
       }
     },
     {
