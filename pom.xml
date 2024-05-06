@@ -35,11 +35,11 @@
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <fusion.version>1.0.18-SNAPSHOT</fusion.version>
+        <fusion.version>1.0.18</fusion.version>
 
-        <yupiik-logging.version>1.0.7</yupiik-logging.version>
-        <tomcat.version>10.1.20</tomcat.version>
-        <junit-jupiter.version>5.10.2</junit-jupiter.version>
+        <yupiik-logging.version>1.0.8</yupiik-logging.version>
+        <tomcat.version>10.1.23</tomcat.version>
+        <junit-jupiter.version>5.11.0-M1</junit-jupiter.version>
         <h2.version>2.2.224</h2.version>
 
         <yupiik.tools.version>1.2.1</yupiik.tools.version>
