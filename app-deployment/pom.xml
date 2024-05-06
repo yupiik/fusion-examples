@@ -137,7 +137,7 @@
                     </skipPackaging>
                     <customPlaceholders>
                         <app.deploytime>${maven.build.timestamp}</app.deploytime>
-                        <!-- extracted palceholders -->
+                        <!-- extracted placeholders -->
                         <bundlebee-placeholder-import-placeholders>
                             ${project.basedir}/bundlebee/placeholders.properties
                         </bundlebee-placeholder-import-placeholders>
