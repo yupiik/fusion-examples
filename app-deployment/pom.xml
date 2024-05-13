@@ -110,6 +110,7 @@
                             <goal>placeholder-extract</goal>
                         </goals>
                         <configuration>
+                            <kubeconfig>explicit</kubeconfig>
                             <skip>${bundlebee.placeholder-extract.skip}</skip>
                             <descriptions>${project.basedir}/bundlebee/descriptions.properties</descriptions>
                             <outputType>FILE</outputType>
