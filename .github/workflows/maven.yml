@@ -19,7 +19,7 @@ name: Github CI
 on: [push, pull_request, workflow_dispatch]
 
 env:
-  MAVEN_OPTS: -Dmaven.repo.local=/home/runner/work/fusion-examples/fusion-examples/.m2 -Dm2.location=/home/runner/work/fusion-examples/fusion-examples/.m2 -Dmaven.artifact.threads=256 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+  MAVEN_OPTS: -Dmaven.repo.local=/home/runner/work/fusion-examples/fusion-examples/.m2 -Dm2.location=/home/runner/work/fusion-examples/fusion-examples/.m2 -Dmaven.artifact.threads=256 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn --errors --batch-mode
 
 jobs:
   build:
@@ -41,8 +41,9 @@ jobs:
           java-version: '21'
       - name: Build
         run: |
-          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.1:wrapper "-Dmaven=3.9.6"
-          ./mvnw dependency:resolve dependency:resolve-plugins --errors --batch-mode --show-version install
+          mvn --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.1:wrapper "-Dmaven=3.9.6"
+          ./mvnw dependency:resolve dependency:resolve-plugins --show-version
+          ./mvnw install
       - name: Remove Snapshots Before Caching
         run: find /home/runner/work/fusion/fusion/.m2 -name '*SNAPSHOT' | xargs rm -Rf
   security_audit:
