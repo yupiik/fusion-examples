@@ -110,8 +110,6 @@
                             <goal>placeholder-extract</goal>
                         </goals>
                         <configuration>
-                            <kubeconfig>explicit</kubeconfig>
-                            <httpclientThreads>1</httpclientThreads>
                             <skip>${bundlebee.placeholder-extract.skip}</skip>
                             <descriptions>${project.basedir}/bundlebee/descriptions.properties</descriptions>
                             <outputType>FILE</outputType>
@@ -126,7 +124,6 @@
                                 observability.deploytime,loki-simple.rbac.apiVersion,prometheus-simple.rbac.apiVersion,
                                 grafana-simple.namespace,loki-simple.namespace,prometheus-simple.namespace,zipkin-simple.namespace,namespace.name
                             </ignoredPlaceholders>
-                            <kubeconfig>explicit</kubeconfig>
                         </configuration>
                     </execution>
                 </executions>
@@ -136,6 +133,7 @@
                     <kubeDryRun>${bundlebee.debug}</kubeDryRun>
                     <kubeVerbose>${bundlebee.debug}</kubeVerbose>
                     <mavenRepositoriesDownloadsEnabled>true</mavenRepositoriesDownloadsEnabled>
+                    <mavenCache>${maven.repo.local}</mavenCache>
                     <skipPackaging>
                         <skipPackaging>none</skipPackaging>
                     </skipPackaging>

@@ -19,7 +19,7 @@ name: Github CI
 on: [push, pull_request, workflow_dispatch]
 
 env:
-  MAVEN_OPTS: -Dmaven.repo.local=/home/runner/work/fusion-examples/fusion-examples/.m2 -Dm2.location=/home/runner/work/fusion-examples/fusion-examples/.m2 -Dmaven.artifact.threads=256 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+  MAVEN_OPTS: -Dmaven.repo.local=/home/runner/work/fusion-examples/fusion-examples/.m2 -Dmaven.artifact.threads=256 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 jobs:
   build:
