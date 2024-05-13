@@ -40,7 +40,9 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
       - name: Build
-        run: mvn install -e
+        run: |
+          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.1:wrapper "-Dmaven=3.9.6"
+          ./mvnw --errors --batch-mode --show-version install
       - name: Remove Snapshots Before Caching
         run: find /home/runner/work/fusion/fusion/.m2 -name '*SNAPSHOT' | xargs rm -Rf
   security_audit:
