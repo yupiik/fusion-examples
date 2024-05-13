@@ -39,6 +39,7 @@
 
         <bundlebee.alveolus.default>all-in-one</bundlebee.alveolus.default>
         <bundlebee.debug>false</bundlebee.debug>
+        <bundlebee.placeholder-extract.skip>false</bundlebee.placeholder-extract.skip>
 
         <app.namespace.name>fusion</app.namespace.name>
         <observability.namespace.name>observability</observability.namespace.name>
@@ -109,6 +110,7 @@
                             <goal>placeholder-extract</goal>
                         </goals>
                         <configuration>
+                            <skip>${bundlebee.placeholder-extract.skip}</skip>
                             <descriptions>${project.basedir}/bundlebee/descriptions.properties</descriptions>
                             <outputType>FILE</outputType>
                             <dumpLocation>${project.basedir}/../app-documentation/minisite/content/_partials/generated/placeholders</dumpLocation>
