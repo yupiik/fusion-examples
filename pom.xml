@@ -145,6 +145,9 @@ under the License.
                 </executions>
                 <configuration>
                     <scope>compile,runtime</scope>
+                    <excludeVulnerabilityIds> <!-- h2, today no fix and we mainly use it for demo purposes -->
+                        <excludeVulnerabilityId>CVE-2018-14335</excludeVulnerabilityId>
+                    </excludeVulnerabilityIds>
                 </configuration>
             </plugin>
             <plugin>
