@@ -40,7 +40,7 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
       - name: Build
-        run: mvn install -Dm2.location=/home/runner/work/fusion-examples/fusion-examples/.m2
+        run: mvn install -Dm2.location=/home/runner/work/fusion-examples/fusion-examples/.m2 -Dbundlebee.placeholder-extract.skip=true
       - name: Remove Snapshots Before Caching
         run: find /home/runner/work/fusion/fusion/.m2 -name '*SNAPSHOT' | xargs rm -Rf
   security_audit:
@@ -60,6 +60,6 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
       - name: Build
-        run: mvn install -pl -DskipTests ossindex:audit
+        run: mvn install -pl -DskipTests ossindex:audit -Dbundlebee.placeholder-extract.skip=true
       - name: Remove Snapshots Before Caching
         run: find /home/runner/work/fusion/fusion/.m2 -name '*SNAPSHOT' | xargs rm -Rf
