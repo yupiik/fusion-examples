@@ -60,6 +60,6 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
       - name: Build
-        run: mvn install -pl ossindex:audit -DskipTests -e
+        run: mvn install ossindex:audit -DskipTests -e
       - name: Remove Snapshots Before Caching
         run: find /home/runner/work/fusion/fusion/.m2 -name '*SNAPSHOT' | xargs rm -Rf
