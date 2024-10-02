@@ -38,7 +38,7 @@
         <fusion.version>1.0.21</fusion.version>
 
         <yupiik-logging.version>1.0.8</yupiik-logging.version>
-        <tomcat.version>10.1.29</tomcat.version>
+        <tomcat.version>10.1.30</tomcat.version>
         <junit-jupiter.version>5.11.0-M1</junit-jupiter.version>
         <h2.version>2.3.232</h2.version>
 
