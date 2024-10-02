@@ -43,7 +43,7 @@
         <h2.version>2.2.224</h2.version>
 
         <yupiik.tools.version>1.2.1</yupiik.tools.version>
-        <yupiik.bundlebee.version>1.0.26</yupiik.bundlebee.version>
+        <yupiik.bundlebee.version>1.0.28</yupiik.bundlebee.version>
     </properties>
 
     <modules>
