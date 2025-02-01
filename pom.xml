@@ -145,8 +145,11 @@ under the License.
                 </executions>
                 <configuration>
                     <scope>compile,runtime</scope>
-                    <excludeVulnerabilityIds> <!-- h2, today no fix and we mainly use it for demo purposes -->
+                    <excludeVulnerabilityIds>
+                        <!-- h2, today no fix and we mainly use it for demo purposes -->
                         <excludeVulnerabilityId>CVE-2018-14335</excludeVulnerabilityId>
+                        <!-- exclude false positive for Tomcat 10.1.x -->
+                        <excludeVulnerabilityId>CVE-2024-56337</excludeVulnerabilityId>
                     </excludeVulnerabilityIds>
                 </configuration>
             </plugin>
