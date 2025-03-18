@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static io.yupiik.fusion.tracing.id.IdGenerator.Type.HEX;
@@ -49,10 +50,15 @@ import static java.time.Clock.systemUTC;
  */
 @DefaultScoped
 public class DemoMetricRegistrar {
+
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+
     protected void onStart(@OnEvent @Order(10_000) final WebServer.Configuration configuration,
                            final MetricsRegistry registry,
                            final BackendConfiguration conf,
                            final JsonMapper json) {
+        logger.info(conf.toString());
+
         // get tomcat to just add a plain filter - generally done with a lib for ex
         final var tomcatConf = configuration.unwrap(TomcatWebServerConfiguration.class);
         // add a custom metric
